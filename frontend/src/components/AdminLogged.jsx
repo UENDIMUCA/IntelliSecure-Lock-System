@@ -1,8 +1,13 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Dashboard from "./Dashboard";
+import CreateUser from "./CreateUser";
 
 const AdminLogged = () => {
-  // State to manage the list of active users
-  //just for moment will be add by api 
+  const navigate = useNavigate(); // Used for navigation
+  const [isOpen, setIsOpen] = useState(false); // Track the dashboard state
+  const [activeSection, setActiveSection] = useState("dashboard");
+
   const [activeUsers, setActiveUsers] = useState([
     "user1@example.com",
     "user2@example.com",
@@ -38,36 +43,66 @@ const AdminLogged = () => {
     }
   };
 
+  // Render content based on the active section
+  const renderContent = () => {
+    switch (activeSection) {
+      case "profile":
+        return (
+          <div>
+            <h2>My Profile</h2>
+            <p>Edit your profile information here.</p>
+            <button onClick={() => setActiveSection("dashboard")}>
+              Back to Dashboard
+            </button>
+          </div>
+        );
+      case "users":
+        return (
+          <div>
+            <h2>Active Users</h2>
+            <ul>
+              {activeUsers.map((user, index) => (
+                <li key={index}>
+                  {user}{" "}
+                  <button onClick={() => handleEditUser(index)}>Edit</button>{" "}
+                  <button onClick={() => handleDeleteUser(index)}>Delete</button>
+                </li>
+              ))}
+            </ul>
+            <button onClick={() => setActiveSection("dashboard")}>
+              Back to Dashboard
+            </button>
+          </div>
+        );
+        case "createusers": // New case for "Create User"
+        return (
+          <div>
+            <CreateUser />
+            <button onClick={() => setActiveSection("dashboard")}>
+              Back to Dashboard
+            </button>
+          </div>
+        );
+      default:
+        return (
+          <div>
+            <h2>Welcome to the Admin Dashboard</h2>
+            <p>Select an option from the left sidebar.</p>
+          </div>
+        );
+    }
+  };
+
   return (
     <div className="admin-dashboard">
-      <h2>Admin Dashboard</h2>
-      <div className="admin-section">
-        <h3>Active Users</h3>
-        <ul>
-          {activeUsers.map((user, index) => (
-            <li key={index} className="user-item">
-              <span>{user}</span>
-              <button
-                onClick={() => handleEditUser(index)}
-                className="user-button edit-button"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => handleDeleteUser(index)}
-                className="user-button delete-button"
-              >
-                Delete
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="admin-section">
-        <h3>Create a New User</h3>
-        <button onClick={handleCreateUser} className="admin-button">
-          Create User
-        </button>
+      <Dashboard
+        setActiveSection={setActiveSection}
+        navigate={navigate}
+        isOpen={isOpen}
+        setIsOpen={setIsOpen} // Pass the toggle function
+      />
+      <div className={`main-content ${isOpen ? "shifted" : ""}`}>
+        {renderContent()}
       </div>
     </div>
   );
