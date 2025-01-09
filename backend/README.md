@@ -15,7 +15,7 @@ To run the backend server, follow these steps:
 
     Fill in the parameters with your database credentials and desired port number.
 
-2. **Install dependencies** by running the following command in the [backend](http://_vscodecontentref_/1) directory:
+2. **Install dependencies** by running the following command in the `backend` directory:
 
     ```sh
     npm install
