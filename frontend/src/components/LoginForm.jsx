@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // For navigation
 import Swal from "sweetalert2"; // For popups
-import "./App.css";
+import "../styles/App.css";
 
 const LoginPage = () => {
   const [email, setEmail] = useState(""); // Email state

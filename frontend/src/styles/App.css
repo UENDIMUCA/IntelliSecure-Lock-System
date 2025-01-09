@@ -174,3 +174,87 @@ ul li {
 .swal2-container {
   outline: none !important; 
 }
+/* Toggle Button */
+.toggle-button {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  font-size: 24px;
+  background: #333;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+/* Dashboard */
+.dashboard {
+  position: fixed;
+  top: 0;
+  left: -250px; /* Hidden by default */
+  width: 250px;
+  height: 100%;
+  background: #333;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px 20px;
+  transition: left 0.3s ease;
+  z-index: 999;
+}
+
+/* Show Dashboard */
+.dashboard.open {
+  left: 0; /* Slide into view */
+}
+
+/* Dashboard Top Section */
+.dashboard-top {
+  margin-top: 25%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Dashboard Options */
+.dashboard-option {
+  padding: 10px 15px;
+  background: #444;
+  color: #fff;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 4px;
+}
+
+.dashboard-option:hover {
+  background: #555;
+}
+
+/* Logout Button */
+.dashboard-bottom {
+  margin-top: auto;
+  margin-bottom: 15%;
+}
+
+.dashboard-option.logout {
+  background: #900;
+  color: #fff;
+}
+
+.dashboard-option.logout:hover {
+  background: #b00;
+}
+
+/* Main content */
+.main-content {
+  transition: margin-left 0.3s ease; /* Smooth transition for shifting */
+  margin-left: 0; /* Default margin when the dashboard is hidden */
+}
+
+.main-content.shifted {
+  margin-left: 250px; /* Adjust the page when the dashboard is open */
+}
