@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Dashboard from "./Dashboard";
-import CreateUser from "./CreateUser";
+import Dashboard from "../components/Dashboard";
+import CreateUser from "../components/CreateUser";
 
 const AdminLogged = () => {
   const navigate = useNavigate(); // Used for navigation
