@@ -4,7 +4,7 @@ import Swal from "sweetalert2"; // For popups
 import "../styles/App.css";
 
 const LoginPage = () => {
-  const [email, setEmail] = useState(""); // Email state
+  const [username, setUsername] = useState(""); // Username state
   const [password, setPassword] = useState(""); // Password state
   const navigate = useNavigate(); // For routing
 
@@ -12,10 +12,10 @@ const LoginPage = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:5000/login", {
+      const response = await fetch("http://localhost:3000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }), // Send username instead of email
       });
 
       const data = await response.json();
@@ -37,7 +37,7 @@ const LoginPage = () => {
       } else {
         Swal.fire({
           title: "Access Denied!",
-          html: "<h4>Invalid email or password.</h4>",
+          html: "<h4>Invalid username or password.</h4>",
           icon: "error",
           confirmButtonText: "Retry",
           confirmButtonColor: "#d33",
@@ -61,13 +61,13 @@ const LoginPage = () => {
         <h2>Login</h2>
         <form onSubmit={handleLogin}>
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="username">Username</label>
             <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
+              type="text"  // Changed from email to text input
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)} // Use username instead of email
+              placeholder="Enter your username"
               required
             />
           </div>
