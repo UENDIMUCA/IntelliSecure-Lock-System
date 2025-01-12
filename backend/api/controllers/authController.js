@@ -25,13 +25,12 @@ module.exports = {
       );
 
       // Send success response with user info
-      res.json({
+      res.status(200).json({
         message: 'Login successful',
         token,
         user: {
-          id: user.id,
           email: user.email,
-          username: user.username,
+          login: user.username,
           isAdmin: user.isAdmin,
         },
       });

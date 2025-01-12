@@ -19,10 +19,11 @@ const LoginPage = () => {
       });
 
       const data = await response.json();
-      console.log("Response from backend:", data); // Log the response for debugging
+      const statusCode = response.status;
+      console.log(data); // Log the response for debugging
 
-      if (data.success) {
-        if (data.isAdmin) {
+      if (statusCode === 200) {
+        if (data.user.isAdmin) {
           console.log("User is an admin. Redirecting to admin dashboard...");
           navigate("/admin"); // Redirect to the admin page
         } else {
@@ -33,6 +34,7 @@ const LoginPage = () => {
             confirmButtonText: "OK",
             confirmButtonColor: "#3085d6",
           });
+          // navigate("/userPage"); TODO: redirect to user page
         }
       } else {
         Swal.fire({
