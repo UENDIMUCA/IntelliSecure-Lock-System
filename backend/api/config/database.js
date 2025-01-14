@@ -8,6 +8,7 @@ const sequelize = new Sequelize(
   {
     host: config.database.host,
     dialect: config.database.dialect,
+    port:5432
   }
 );
 
