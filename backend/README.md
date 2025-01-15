@@ -81,3 +81,6 @@ Ensure you have a PostgreSQL database running and update the `.env` file with yo
   - `GET /api/users/:id`: Get a user by ID (requires authentication).
   - `PUT /api/users/:id`: Update a user by ID (requires authentication).
   - `DELETE /api/users/:id`: Delete a user by ID (requires authentication).
+
+**Run Admin script**
+- Command to run: npm run create-admin
