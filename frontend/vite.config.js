@@ -1,22 +1,14 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import path from 'path';
+import { defineConfig } from "vite"
+import react from "@vitejs/plugin-react"
 
 export default defineConfig({
   plugins: [react()],
   css: {
-    postcss: './postcss.config.js',
+    postcss: "./postcss.config.js",
   },
   resolve: {
     alias: {
-<<<<<<< HEAD
-      "@": "/src", 
+      "@": "/src", // Adjust to match your project structure
     },
   },
 })
-=======
-      '@': path.resolve(__dirname, './src'), // Adds alias for "@/"
-    },
-  },
-});
->>>>>>> 5b1135de13d86b1e025e3103482135537217c470
