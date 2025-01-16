@@ -30,4 +30,29 @@ User.beforeUpdate(async (user) => {
   }
 });
 
+// Hook Sequelize pour créer un admin par défaut après la synchronisation de la table
+User.afterSync(async () => {
+  const adminUsername = process.env.ADMIN_USERNAME || 'admin';
+  const adminPassword = process.env.ADMIN_PASSWORD || 'admin';
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
+  const adminPincode = process.env.ADMIN_PINCODE || '1234'; 
+  const adminUid = process.env.ADMIN_UID || 'admin-uid-001'; 
+
+
+  const adminExists = await User.findOne({ where: { username: adminUsername } });
+
+  if (!adminExists) {
+    const hashedPassword = await bcrypt.hash(adminPassword, 10);
+    await User.create({
+      username: adminUsername,
+      password: hashedPassword,
+      email: adminEmail,
+      pinCode: adminPincode,
+      uid: adminUid,
+      isAdmin: true,
+    });
+    console.log(`Admin user created with username: ${adminUsername}`);
+  }
+});
+
 module.exports = User;
