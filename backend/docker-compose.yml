@@ -2,7 +2,11 @@ version: '3.8'
 
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: superlulu90/backend:latest
+    restart: always
     ports:
       - "3000:3000"
     environment:
@@ -16,7 +20,8 @@ services:
       - .:/app
       - /app/node_modules
     depends_on:
-      - postgres
+      postgres:
+        condition: service_started
 
   postgres:
     image: postgres:16
