@@ -39,4 +39,66 @@ module.exports = {
       res.status(500).json({ error: 'Internal server error' });
     }
   },
+  rfid_login: async (req, res) => {
+    // Destructure 'uid' from req.body
+    const { uid } = req.body;
+
+    try {
+      // Search by 'uid'
+      const user = await User.findOne({ where: { uid } });
+      if (!user) return res.status(404).json({ error: 'User not found' });
+
+      // Generate JWT
+      const token = jwt.sign(
+        { id: user.id, email: user.email, username:user.username, isAdmin: user.isAdmin },
+        config.jwt.secret,
+        { expiresIn: config.jwt.expiresIn }
+      );
+
+      // Send success response with user info
+      res.status(200).json({
+        message: 'Login successful',
+        token,
+        user: {
+          email: user.email,
+          username: user.username,
+          isAdmin: user.isAdmin,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+  pin_login: async (req, res) => {
+    // Destructure 'pinCode' from req.body
+    const { pinCode } = req.body;
+
+    try {
+      // Search by 'pinCode'
+      const user = await User.findOne({ where: { pinCode } });
+      if (!user) return res.status(404).json({ error: 'User not found' });
+
+      // Generate JWT
+      const token = jwt.sign(
+        { id: user.id, email: user.email, username:user.username, isAdmin: user.isAdmin },
+        config.jwt.secret,
+        { expiresIn: config.jwt.expiresIn }
+      );
+
+      // Send success response with user info
+      res.status(200).json({
+        message: 'Login successful',
+        token,
+        user: {
+          email: user.email,
+          username: user.username,
+          isAdmin: user.isAdmin,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
 };
