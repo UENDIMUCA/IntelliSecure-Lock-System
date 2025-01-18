@@ -27,6 +27,7 @@ const loginFormSchema = z.object({
 });
 
 const LoginPage = () => {
+  console.log(import.meta.env);
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
