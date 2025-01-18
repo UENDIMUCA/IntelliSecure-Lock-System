@@ -16,16 +16,16 @@ const User = sequelize.define('User', {
   timestamps: true,
 });
 
+const saltRounds = 10;
 
 // Hook Sequelize pour hasher le mot de passe avant de sauvegarder
 User.beforeCreate(async (user) => {
-  const saltRounds = 10;
+
   user.password = await bcrypt.hash(user.password, saltRounds);
 });
 
 User.beforeUpdate(async (user) => {
   if (user.changed('password')) {
-    const saltRounds = 10;
     user.password = await bcrypt.hash(user.password, saltRounds);
   }
 });
@@ -42,10 +42,9 @@ User.afterSync(async () => {
   const adminExists = await User.findOne({ where: { username: adminUsername } });
 
   if (!adminExists) {
-    const hashedPassword = await bcrypt.hash(adminPassword, 10);
     await User.create({
       username: adminUsername,
-      password: hashedPassword,
+      password: adminPassword,
       email: adminEmail,
       pinCode: adminPincode,
       uid: adminUid,
