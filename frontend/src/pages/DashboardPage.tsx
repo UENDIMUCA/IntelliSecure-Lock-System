@@ -3,7 +3,6 @@ import axios from "axios";
 import {getLoggedUser} from "@/lib/utils.ts";
 import {LoggedUser, User} from "@/lib/types.ts";
 import LogoutButton from "@/components/LogoutButton.tsx";
-import NeedLogged from "@/lib/NeedLogged.tsx";
 
 const DashboardPage = () => {
     const [user, setUser] = useState<LoggedUser|null>(null);
@@ -27,7 +26,6 @@ const DashboardPage = () => {
 
     return (
         <div>
-            <NeedLogged adminRight={true}/>
             <h1>Welcome {user ? user.login : 'null'}</h1>
             <LogoutButton/>
             <ul className="list-disc">
