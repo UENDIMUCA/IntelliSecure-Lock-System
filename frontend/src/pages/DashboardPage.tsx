@@ -1,13 +1,13 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
 import {getLoggedUser} from "@/lib/utils.ts";
-import {LoggedUser} from "@/lib/types.ts";
+import {LoggedUser, User} from "@/lib/types.ts";
 import LogoutButton from "@/components/LogoutButton.tsx";
 import NeedLogged from "@/lib/NeedLogged.tsx";
 
 const DashboardPage = () => {
     const [user, setUser] = useState<LoggedUser|null>(null);
-    const [users, setUsers] = useState<any[]>([]);
+    const [users, setUsers] = useState<User[]>([]);
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -27,7 +27,7 @@ const DashboardPage = () => {
 
     return (
         <div>
-            <NeedLogged/>
+            <NeedLogged adminRight={true}/>
             <h1>Welcome {user ? user.login : 'null'}</h1>
             <LogoutButton/>
             <ul className="list-disc">
