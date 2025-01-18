@@ -24,22 +24,23 @@ import {useNavigate} from "react-router-dom";
 import {isAdmin, isLogged} from "@/lib/utils.ts";
 import {useEffect} from "react";
 
-const formSchema = z.object({
-  username: z.string(),
-  password: z.string(),
+const loginFormSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
 });
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof loginFormSchema>>({
+    resolver: zodResolver(loginFormSchema),
     defaultValues: {
       username: "",
       password: "",
     },
+
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = (values: z.infer<typeof loginFormSchema>) => {
     console.log("Form values:", values);
     axios.post(`/api/auth/login/`, values)
         .then((res) => {
@@ -50,7 +51,9 @@ const LoginPage = () => {
             navigate('/dashboard');
         })
         .catch((res)=> {
-            console.log(res.status);
+            form.setError('password', {type: 'error', message: 'Username or password is incorrect'});
+            form.setError('username', {type: 'error', message: 'Username or password is incorrect'});
+          console.log(res);
         });
   };
 
@@ -78,15 +81,15 @@ const LoginPage = () => {
               control={form.control}
               name="username"
               render={({ field }) => (
-                <FormItem className="grid gap-4">
-                  <FormLabel>username</FormLabel>
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
                   <FormControl>
                     <Input
                       type="text"
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage/>
                 </FormItem>
               )}
             />
@@ -94,12 +97,12 @@ const LoginPage = () => {
               control={form.control}
               name="password"
               render={({ field }) => (
-                <FormItem className="grid gap-4">
+                <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
                     <Input type="password" {...field} />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage/>
                 </FormItem>
               )}
             />
