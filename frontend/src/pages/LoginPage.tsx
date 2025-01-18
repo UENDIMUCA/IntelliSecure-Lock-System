@@ -41,7 +41,6 @@ const LoginPage = () => {
   });
 
   const onSubmit = (values: z.infer<typeof loginFormSchema>) => {
-    console.log("Form values:", values);
     axios.post(`/api/auth/login/`, values)
         .then((res) => {
             localStorage.setItem("token", res.data.token);
