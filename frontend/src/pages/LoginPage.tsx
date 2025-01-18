@@ -19,8 +19,8 @@ import {
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
 import {useNavigate} from "react-router-dom";
+import apiClient from "@/lib/apiClient.ts";
 const loginFormSchema = z.object({
   username: z.string().min(1, "Username is required"),
   password: z.string().min(1, "Password is required"),
@@ -38,7 +38,7 @@ const LoginPage = () => {
   });
 
   const onSubmit = (values: z.infer<typeof loginFormSchema>) => {
-    axios.post(`/api/auth/login/`, values)
+    apiClient.post(`/api/auth/login/`, values)
         .then((res) => {
             localStorage.setItem("token", res.data.token);
             localStorage.setItem("user", JSON.stringify(res.data.user));

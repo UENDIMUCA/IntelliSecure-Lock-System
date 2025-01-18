@@ -1,8 +1,8 @@
 import {useEffect, useState} from "react";
-import axios from "axios";
 import {getLoggedUser} from "@/lib/utils.ts";
 import {LoggedUser, User} from "@/lib/types.ts";
 import LogoutButton from "@/components/LogoutButton.tsx";
+import apiClient from "@/lib/apiClient.ts";
 
 const DashboardPage = () => {
     const [user, setUser] = useState<LoggedUser|null>(null);
@@ -12,7 +12,7 @@ const DashboardPage = () => {
         const token = localStorage.getItem("token");
         const user = getLoggedUser();
         setUser(user);
-        axios.get('/api/users', {
+        apiClient.get('/api/users', {
             headers: {
                 authorization: `Bearer ${token}`,
             }
