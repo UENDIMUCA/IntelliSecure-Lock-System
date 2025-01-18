@@ -1,12 +1,12 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import {LoggedUser} from "@/lib/types.ts";
+import {User} from "@/lib/types.ts";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function getLoggedUser(): LoggedUser | null {
+export function getLoggedUser(): User | null {
   const user = localStorage.getItem("user");
   if (user){
     return JSON.parse(user);
@@ -19,7 +19,7 @@ export function isLogged(): boolean {
 }
 
 export function isAdmin(): boolean {
-  const user: LoggedUser | null = getLoggedUser();
+  const user: User | null = getLoggedUser();
   if (user){
     return user.isAdmin;
   }
