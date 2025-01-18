@@ -44,16 +44,13 @@ const LoginPage = () => {
     console.log("Form values:", values);
     axios.post(`/api/auth/login/`, values)
         .then((res) => {
-            console.log(res);
-            console.log(res.data.user);
             localStorage.setItem("token", res.data.token);
             localStorage.setItem("user", JSON.stringify(res.data.user));
             navigate('/dashboard');
         })
-        .catch((res)=> {
+        .catch(()=> {
             form.setError('password', {type: 'error', message: 'Username or password is incorrect'});
             form.setError('username', {type: 'error', message: 'Username or password is incorrect'});
-          console.log(res);
         });
   };
 
