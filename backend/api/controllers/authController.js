@@ -29,12 +29,7 @@ module.exports = {
       res.status(200).json({
         message: 'Login successful',
         token,
-        user: {
-          email: user.email,
-          login: user.username,
-          isAdmin: user.isAdmin,
-          pinCode: user.pinCode,
-        },
+        user: user.toJSON(),
       });
     } catch (error) {
       console.error(error);
@@ -61,11 +56,7 @@ module.exports = {
       res.status(200).json({
         message: 'Login successful',
         token,
-        user: {
-          email: user.email,
-          username: user.username,
-          isAdmin: user.isAdmin,
-        },
+        user: user.toJSON(),
       });
     } catch (error) {
       console.error(error);
@@ -99,12 +90,7 @@ module.exports = {
       res.status(200).json({
         message: 'Login successful',
         token,
-        user: {
-          email: user.email,
-          username: user.username,
-          isAdmin: user.isAdmin,
-          pincode: user.pincode,
-        },
+        user: user.toJSON(),
       });
     } catch (error) {
       console.error(error);

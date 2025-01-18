@@ -16,6 +16,12 @@ const User = sequelize.define('User', {
   timestamps: true,
 });
 
+User.prototype.toJSON = function () {
+  const values = { ...this.get() };
+  delete values.password;
+  return values;
+};
+
 const saltRounds = 10;
 
 // Hook Sequelize pour hasher le mot de passe avant de sauvegarder
