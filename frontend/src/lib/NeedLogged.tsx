@@ -3,10 +3,10 @@ import {useEffect} from "react";
 import {isAdmin, isLogged} from "@/lib/utils.ts";
 
 type Prop = {
-  adminRight: boolean
+  adminRight?: boolean
 }
 
-const NeedLogged = ({adminRight} : Prop) => {
+const NeedLogged = ({adminRight = false} : Prop) => {
   const navigate = useNavigate();
 
   useEffect(() => {
