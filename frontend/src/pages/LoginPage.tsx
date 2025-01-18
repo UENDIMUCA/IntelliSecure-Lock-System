@@ -21,9 +21,6 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
-import {isAdmin, isLogged} from "@/lib/utils.ts";
-import {useEffect} from "react";
-
 const loginFormSchema = z.object({
   username: z.string().min(1, "Username is required"),
   password: z.string().min(1, "Password is required"),
@@ -52,15 +49,6 @@ const LoginPage = () => {
             form.setError('username', {type: 'error', message: 'Username or password is incorrect'});
         });
   };
-
-  useEffect(() => {
-    if (isAdmin()) {
-      navigate("/dashboard");
-    }
-    if (isLogged()) {
-      // TODO navigate to not admin page
-    }
-  }, [navigate]);
 
   return (
     <Form {...form}>
