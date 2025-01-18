@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button.tsx";
 import {
   Card,
   CardContent,
@@ -6,8 +6,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+} from "@/components/ui/card.tsx";
+import { Input } from "@/components/ui/input.tsx";
 import {
   Form,
   FormControl,
@@ -15,18 +15,22 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from "@/components/ui/form.tsx";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
+import {useNavigate} from "react-router-dom";
+import {isAdmin, isLogged} from "@/lib/utils.ts";
+import {useEffect} from "react";
 
 const formSchema = z.object({
   username: z.string(),
   password: z.string(),
 });
 
-const LoginForm = () => {
+const LoginPage = () => {
+  const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -37,8 +41,27 @@ const LoginForm = () => {
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     console.log("Form values:", values);
-    axios.post(`/api/auth/login/`, values);
+    axios.post(`/api/auth/login/`, values)
+        .then((res) => {
+            console.log(res);
+            console.log(res.data.user);
+            localStorage.setItem("token", res.data.token);
+            localStorage.setItem("user", JSON.stringify(res.data.user));
+            navigate('/dashboard');
+        })
+        .catch((res)=> {
+            console.log(res.status);
+        });
   };
+
+  useEffect(() => {
+    if (isAdmin()) {
+      navigate("/dashboard");
+    }
+    if (isLogged()) {
+      // TODO navigate to not admin page
+    }
+  }, [navigate]);
 
   return (
     <Form {...form}>
@@ -90,4 +113,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default LoginPage;
