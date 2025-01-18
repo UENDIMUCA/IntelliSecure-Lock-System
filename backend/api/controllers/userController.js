@@ -19,7 +19,7 @@ module.exports = {
         endDate: isTemporary ? endDate : null,
       });
 
-      res.status(201).json(user);
+      res.status(201).json(user.toJSON());
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -27,13 +27,13 @@ module.exports = {
 
   getAllUsers: async (req, res) => {
     const users = await User.findAll();
-    res.json(users);
+    res.json(users.toJSON());
   },
 
   getUserById: async (req, res) => {
     const user = await User.findByPk(req.params.id);
     if (!user) return res.status(404).json({ error: 'User not found' });
-    res.json(user);
+    res.json(user.toJSON);
   },
 
   updateUser: async (req, res) => {
@@ -57,7 +57,7 @@ module.exports = {
         endDate: isTemporary ? endDate : user.endDate,
       });
 
-      res.json(user);
+      res.json(user.toJSON());
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
