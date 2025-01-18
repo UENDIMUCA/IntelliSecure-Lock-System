@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const config = require('../config/config');
 const User = require('../models/user');
+const generateUniquePincode = require('../utils/pinCodeGenerator');
 
 module.exports = {
   login: async (req, res) => {
@@ -19,7 +20,7 @@ module.exports = {
 
       // Generate JWT
       const token = jwt.sign(
-        { id: user.id, email: user.email, isAdmin: user.isAdmin },
+        { id: user.id, email: user.email, isAdmin: user.isAdmin, pinCode: user.pinCode },
         config.jwt.secret,
         { expiresIn: config.jwt.expiresIn }
       );
@@ -32,6 +33,7 @@ module.exports = {
           email: user.email,
           login: user.username,
           isAdmin: user.isAdmin,
+          pinCode: user.pinCode,
         },
       });
     } catch (error) {
@@ -72,19 +74,26 @@ module.exports = {
   },
   pin_login: async (req, res) => {
     // Destructure 'pinCode' from req.body
-    const { pinCode } = req.body;
+    const { pincode } = req.body;
 
     try {
       // Search by 'pinCode'
-      const user = await User.findOne({ where: { pinCode } });
+      const user = await User.findOne({ where: { pincode } });
       if (!user) return res.status(404).json({ error: 'User not found' });
 
       // Generate JWT
       const token = jwt.sign(
-        { id: user.id, email: user.email, username:user.username, isAdmin: user.isAdmin },
+        { id: user.id, email: user.email, username:user.username, isAdmin: user.isAdmin, pinCode: user.pinCode },
         config.jwt.secret,
         { expiresIn: config.jwt.expiresIn }
       );
+
+      // Generate a new unique PIN code
+      const newPinCode = await generateUniquePincode();
+
+      // Update the user with the new PIN code
+      user.pincode = newPinCode;
+      await user.save();
 
       // Send success response with user info
       res.status(200).json({
@@ -94,6 +103,7 @@ module.exports = {
           email: user.email,
           username: user.username,
           isAdmin: user.isAdmin,
+          pincode: user.pincode,
         },
       });
     } catch (error) {

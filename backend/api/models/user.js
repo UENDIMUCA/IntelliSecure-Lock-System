@@ -6,7 +6,7 @@ const User = sequelize.define('User', {
   username: { type: DataTypes.STRING, allowNull: false, unique: true },
   email: { type: DataTypes.STRING, allowNull: false, unique: true },
   password: { type: DataTypes.STRING, allowNull: false },
-  pinCode: { type: DataTypes.STRING, allowNull: false },
+  pincode: { type: DataTypes.STRING, allowNull: false },
   uid: { type: DataTypes.STRING, allowNull: false },
   isAdmin: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
   beginDate: { type: DataTypes.DATE, allowNull: true },
@@ -46,7 +46,7 @@ User.afterSync(async () => {
       username: adminUsername,
       password: adminPassword,
       email: adminEmail,
-      pinCode: adminPincode,
+      pincode: adminPincode,
       uid: adminUid,
       isAdmin: true,
     });
