@@ -10,4 +10,12 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://api.intelli-secure.tom-fourcaudot.com',
+        changeOrigin: true,
+      },
+    },
+  },
 });

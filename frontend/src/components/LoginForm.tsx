@@ -37,7 +37,7 @@ const LoginForm = () => {
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     console.log("Form values:", values);
-    axios.post(`${import.meta.env.VITE_API_URL}/auth/login/`, values);
+    axios.post(`/api/auth/login/`, values);
   };
 
   return (
