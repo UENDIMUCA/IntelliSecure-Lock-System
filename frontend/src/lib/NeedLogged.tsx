@@ -15,7 +15,7 @@ const NeedLogged = ({adminRight} : Prop) => {
     } else {
       if(!isLogged()) navigate(-1);
     }
-  }, [navigate]);
+  }, [navigate, adminRight]);
 
   return(
     <></>
