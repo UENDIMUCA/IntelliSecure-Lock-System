@@ -6,7 +6,7 @@ const User = sequelize.define('User', {
   username: { type: DataTypes.STRING, allowNull: false, unique: true },
   email: { type: DataTypes.STRING, allowNull: false, unique: true },
   password: { type: DataTypes.STRING, allowNull: false },
-  pinCode: { type: DataTypes.INTEGER, allowNull: false },
+  pinCode: { type: DataTypes.STRING, allowNull: false },
   uid: { type: DataTypes.STRING, allowNull: false },
   isAdmin: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
   beginDate: { type: DataTypes.DATE, allowNull: true },
@@ -32,11 +32,11 @@ User.beforeUpdate(async (user) => {
 
 // Hook Sequelize pour créer un admin par défaut après la synchronisation de la table
 User.afterSync(async () => {
-  const adminUsername = process.env.ADMIN_USERNAME || 'admin';
-  const adminPassword = process.env.ADMIN_PASSWORD || 'admin';
-  const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
-  const adminPincode = process.env.ADMIN_PINCODE || '1234'; 
-  const adminUid = process.env.ADMIN_UID || 'admin-uid-001'; 
+  const adminUsername = process.env.ADMIN_USERNAME;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPincode = process.env.ADMIN_PINCODE;
+  const adminUid = process.env.ADMIN_UID;
 
 
   const adminExists = await User.findOne({ where: { username: adminUsername } });
