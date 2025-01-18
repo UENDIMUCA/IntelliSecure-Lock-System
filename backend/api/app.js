@@ -7,9 +7,9 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 
 
-// const corsMiddleware = require('./middleware/corsMiddleware');
+const corsMiddleware = require('./middleware/corsMiddleware');
 
-// app.use(corsMiddleware);
+app.use(corsMiddleware);
 
 app.use(express.json());
 

@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button.tsx";
 import {
   Card,
   CardContent,
@@ -6,8 +6,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+} from "@/components/ui/card.tsx";
+import { Input } from "@/components/ui/input.tsx";
 import {
   Form,
   FormControl,
@@ -15,29 +15,39 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from "@/components/ui/form.tsx";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
-
-const formSchema = z.object({
-  username: z.string(),
-  password: z.string(),
+import {useNavigate} from "react-router-dom";
+import apiClient from "@/lib/apiClient.ts";
+const loginFormSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
 });
 
-const LoginForm = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+const LoginPage = () => {
+  const navigate = useNavigate();
+  const form = useForm<z.infer<typeof loginFormSchema>>({
+    resolver: zodResolver(loginFormSchema),
     defaultValues: {
       username: "",
       password: "",
     },
+
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log("Form values:", values);
-    axios.post(`/api/auth/login/`, values);
+  const onSubmit = (values: z.infer<typeof loginFormSchema>) => {
+    apiClient.post(`/api/auth/login/`, values)
+        .then((res) => {
+            localStorage.setItem("token", res.data.token);
+            localStorage.setItem("user", JSON.stringify(res.data.user));
+            navigate('/dashboard');
+        })
+        .catch(()=> {
+            form.setError('password', {type: 'error', message: 'Username or password is incorrect'});
+            form.setError('username', {type: 'error', message: 'Username or password is incorrect'});
+        });
   };
 
   return (
@@ -55,15 +65,15 @@ const LoginForm = () => {
               control={form.control}
               name="username"
               render={({ field }) => (
-                <FormItem className="grid gap-4">
-                  <FormLabel>username</FormLabel>
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
                   <FormControl>
                     <Input
                       type="text"
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage/>
                 </FormItem>
               )}
             />
@@ -71,12 +81,12 @@ const LoginForm = () => {
               control={form.control}
               name="password"
               render={({ field }) => (
-                <FormItem className="grid gap-4">
+                <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
                     <Input type="password" {...field} />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage/>
                 </FormItem>
               )}
             />
@@ -90,4 +100,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default LoginPage;
