@@ -11,7 +11,7 @@ module.exports = {
     try {
       // Search by 'username'
       const user = await User.findOne({ where: { username } });
-      if (!user) return res.status(404).json({ error: 'User not found' });
+      if (!user) return res.status(401).json({ error: 'User not found' });
 
       // Compare passwords
       const isMatch = await bcrypt.compare(password, user.password);
