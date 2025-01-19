@@ -3,15 +3,20 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <Stepper.h>
+#include <Keypad.h>
+#include <string.h>
+
+#define ROW_NUM     4 // four rows
+#define COLUMN_NUM  4 // four columns
 
 #define RST_PIN 22   // Pin RST pour RC522
 #define SDA_PIN 21   // Pin SDA pour RC522
 
 // ULN2003 Motor Driver Pins
-#define IN1 27
-#define IN2 32
-#define IN3 33
-#define IN4 25
+#define IN1 32
+#define IN2 33
+#define IN3 25
+#define IN4 16
 
 #define BUZZER_PIN 26 // Pin pour buzzer
 
@@ -26,8 +31,24 @@ Stepper myStepper(stepsPerRevolution, IN1, IN3, IN2, IN4); // initialize the ste
 const char ssid[] = "lucas";
 const char password[] = "draisine";
 
+char keys[ROW_NUM][COLUMN_NUM] = {
+  {'1', '2', '3', 'A'},
+  {'4', '5', '6', 'B'},
+  {'7', '8', '9', 'C'},
+  {'*', '0', '#', 'D'}
+};
+
+char numbers[10] = {'1','2','3','4','5','6','7','8','9','0'};
+char functions[2] = {'A','B'};
+String pin = "";
+
+byte pin_rows[ROW_NUM] = {5, 4, 17, 15};
+byte pin_column[COLUMN_NUM] = {13, 12, 14, 27};
+
+Keypad keypad = Keypad( makeKeymap(keys), pin_rows, pin_column, ROW_NUM, COLUMN_NUM );
+
 // Server configuration
-const String authApiUrlRFID = "http://172.20.10.4:3000/api/auth/rfid_login";
+const String authApiUrl = "https://api.intelli-secure.tom-fourcaudot.com/api/auth/";
 
 WiFiClient espClient;
 
@@ -55,7 +76,37 @@ void setup() {
 }
 
 void loop() {
+  handlePin();
   handleRFID();
+}
+
+// --- Handle Pin ---
+void handlePin() {
+  char key = keypad.getKey();
+
+  if (key) {
+    if (key >= '0' && key <= '9') {
+      Serial.println("number");
+      if (pin.length() >= 4) {
+        pin = ""; 
+        triggerAlert(100, 50, 3); 
+      } else {
+        triggerAlert(100, 0, 1); 
+        pin += String(key); 
+      }
+      Serial.println(pin);  
+    }
+    else if (key == 'A' || key == 'B') {
+      if (key == 'A') {
+        triggerAlert(100, 0, 1); 
+        send("pin_login", pin);
+        pin="";
+      } else if(pin.length()>0) {
+        triggerAlert(100, 50, 2);
+        pin = ""; 
+      }
+    }
+  }
 }
 
 // --- Handle RFID ---
@@ -75,21 +126,28 @@ void handleRFID() {
 
   Serial.println(uid);
 
-  triggerAlert();
+  triggerAlert(200, 0, 1);
 
-  send("uid",uid);
+  send("rfid_login",uid);
 
   mfrc522.PICC_HaltA();
 }
 
-void send(String type, String uid) {
+int send(String endURL, String value) {
+  int httpResponseCode = -1;
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
-    http.begin(authApiUrlRFID);
+    String type = "";
+    if(endURL=="rfid_login"){
+      type="uid";
+    }else if(endURL=="pin_login"){
+      type="pincode";
+    }
+    http.begin(authApiUrl+endURL);
     http.addHeader("Content-Type", "application/json");
-    String httpRequestData = "{\""+type+"\":\"" + uid + "\"}";
+    String httpRequestData = "{\""+type+"\":\"" + value + "\"}";
     Serial.println(httpRequestData);
-    int httpResponseCode = http.POST(httpRequestData);
+    httpResponseCode = http.POST(httpRequestData);
 
     if (httpResponseCode > 0) {
       String response = http.getString();
@@ -98,9 +156,11 @@ void send(String type, String uid) {
 
       if (httpResponseCode == 404) {
         //mqtt publish error on topic for raspberry screen
+        triggerAlert(100, 50, 3);
       } else {
         //same (publish state of the door)
         //call openDoor function if door open
+        triggerAlert(500, 0, 1);
         door();
       }
     } else {
@@ -111,6 +171,8 @@ void send(String type, String uid) {
   } else {
     Serial.println("WiFi disconnected");
   }
+
+  return httpResponseCode;
 }
 
 void door() {
@@ -122,8 +184,11 @@ void door() {
   doorOpen = !doorOpen; // Basculer l'état
 }
 
-void triggerAlert() {
-  digitalWrite(BUZZER_PIN, HIGH);
-  delay(200);
-  digitalWrite(BUZZER_PIN, LOW);
+void triggerAlert(int _delay, int _delay2, int loop) {
+  for(int i = 0; i < loop; i++){
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(_delay);
+    digitalWrite(BUZZER_PIN, LOW);
+    delay(_delay2);
+  }
 }
