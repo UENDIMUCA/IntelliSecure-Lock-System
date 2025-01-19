@@ -2,13 +2,25 @@
 #include <MFRC522.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <Stepper.h>
 
 #define RST_PIN 22   // Pin RST pour RC522
 #define SDA_PIN 21   // Pin SDA pour RC522
 
+// ULN2003 Motor Driver Pins
+#define IN1 27
+#define IN2 32
+#define IN3 33
+#define IN4 25
+
 #define BUZZER_PIN 26 // Pin pour buzzer
 
 MFRC522 mfrc522(SDA_PIN, RST_PIN);  // Créer une instance de MFRC522
+
+bool doorOpen = true;
+const int stepsPerRevolution = 512;
+
+Stepper myStepper(stepsPerRevolution, IN1, IN3, IN2, IN4); // initialize the stepper library
 
 // WiFi configuration
 const char ssid[] = "lucas";
@@ -20,6 +32,9 @@ const String authApiUrlRFID = "http://172.20.10.4:3000/api/auth/rfid_login";
 WiFiClient espClient;
 
 void setup() {
+  // set the speed at 15 rpm
+  myStepper.setSpeed(15);
+
   Serial.begin(115200);   // Initialiser la communication série
 
   // WiFi setup
@@ -62,17 +77,17 @@ void handleRFID() {
 
   triggerAlert();
 
-  sendUID(uid);
+  send("uid",uid);
 
   mfrc522.PICC_HaltA();
 }
 
-void sendUID(String uid) {
+void send(String type, String uid) {
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
     http.begin(authApiUrlRFID);
     http.addHeader("Content-Type", "application/json");
-    String httpRequestData = "{\"uid\":\"" + uid + "\"}";
+    String httpRequestData = "{\""+type+"\":\"" + uid + "\"}";
     Serial.println(httpRequestData);
     int httpResponseCode = http.POST(httpRequestData);
 
@@ -86,6 +101,7 @@ void sendUID(String uid) {
       } else {
         //same (publish state of the door)
         //call openDoor function if door open
+        door();
       }
     } else {
       Serial.print("Error in POST request: ");
@@ -95,6 +111,15 @@ void sendUID(String uid) {
   } else {
     Serial.println("WiFi disconnected");
   }
+}
+
+void door() {
+  if (!doorOpen) {
+    myStepper.step(stepsPerRevolution); // Ouvrir
+  } else {
+    myStepper.step(-stepsPerRevolution); // Fermer
+  }
+  doorOpen = !doorOpen; // Basculer l'état
 }
 
 void triggerAlert() {
