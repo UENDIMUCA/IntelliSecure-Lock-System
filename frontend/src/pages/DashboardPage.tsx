@@ -1,22 +1,17 @@
 import {useEffect, useState} from "react";
 import {getLoggedUser} from "@/lib/utils.ts";
-import {LoggedUser, User} from "@/lib/types.ts";
+import {User} from "@/lib/types.ts";
 import LogoutButton from "@/components/LogoutButton.tsx";
 import apiClient from "@/lib/apiClient.ts";
 
 const DashboardPage = () => {
-    const [user, setUser] = useState<LoggedUser|null>(null);
+    const [user, setUser] = useState<User|null>(null);
     const [users, setUsers] = useState<User[]>([]);
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
         const user = getLoggedUser();
         setUser(user);
-        apiClient.get('/api/users', {
-            headers: {
-                authorization: `Bearer ${token}`,
-            }
-        })
+        apiClient.get('/api/users')
             .then((res) =>{
                 console.log(res.data[0]);
                 setUsers(res.data);
@@ -26,7 +21,7 @@ const DashboardPage = () => {
 
     return (
         <div>
-            <h1>Welcome {user ? user.login : 'null'}</h1>
+            <h1>Welcome {user ? user.username : 'null'}</h1>
             <LogoutButton/>
             <ul className="list-disc">
                 {users.map((user) =>
