@@ -25,10 +25,10 @@ const NotLoggedRoutes = () => {
 
 const App = () => {
   return (
-    <>
+    <div className={'w-screen overflow-x-hidden'}>
       <Router>
         <NavBar/>
-        <div className="flex flex-col items-center justify-center pt-4 w-full md:mx-2">
+        <div className="flex flex-col items-center justify-center pt-4 w-full px-2">
           <Routes>
               {/* Routes that don't need any rights */}
 
@@ -47,7 +47,7 @@ const App = () => {
           </Routes>
         </div>
       </Router>
-    </>
+    </div>
   );
 };
 
