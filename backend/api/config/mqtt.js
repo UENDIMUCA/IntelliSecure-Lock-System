@@ -1,10 +1,10 @@
 const mqtt = require('mqtt');
 
 const options = {
-    host: 'mosquitto.intelli-secure.tom-fourcaudot.com',
+    host: process.env.MQTT_HOST,
     port: 1883, 
-    username: 'admin', 
-    password: 'E6PKMWup3CSmaJT1Wtt4mx4BqJ',
+    username: process.env.MQTT_USERNAME, 
+    password: process.env.MQTT_PASSWORD,
   };
   
 const mqttClient = mqtt.connect(options);
