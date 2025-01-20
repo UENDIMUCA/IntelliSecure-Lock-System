@@ -1,11 +1,12 @@
 const User = require('../models/user');
+const generateUniquePincode = require('../utils/pinCodeGenerator');
 
 module.exports = {
   createUser: async (req, res) => {
     try {
       const { isTemporary, beginDate, endDate } = req.body;
 
-      const _pincode = generateUniquePincode();
+      const _pincode = await generateUniquePincode(); // Utilisez await pour attendre la résolution de la promesse
 
       // If this is a temporary user, validate the dates
       if (isTemporary) {
@@ -30,7 +31,7 @@ module.exports = {
 
   getAllUsers: async (req, res) => {
     const users = await User.findAll();
-    res.json(users.toJSON());
+    res.json(users.map((user) => user.toJSON()));
   },
 
   getUserById: async (req, res) => {
