@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from "react-
 import DashboardPage from "@/pages/DashboardPage.tsx";
 import {isAdmin, isLogged} from "@/lib/utils.ts";
 import UserPage from "@/pages/UserPage.tsx";
+import NavBar from "@/components/NavBar.tsx";
 
 const LoggedRoutes = () => {
   return (
@@ -24,26 +25,29 @@ const NotLoggedRoutes = () => {
 
 const App = () => {
   return (
-    <div className="flex items-center justify-center h-screen">
+    <>
       <Router>
-        <Routes>
-          {/* Routes that don't need any rights */}
+        <NavBar/>
+        <div className="flex flex-col items-center justify-center pt-4 w-full md:mx-2">
+          <Routes>
+              {/* Routes that don't need any rights */}
 
-          {/* Routes that need to have no users*/}
-          <Route element={<NotLoggedRoutes/>}>
-            <Route path="/" element={<LoginPage/>}/>
-          </Route>
-          {/* Routes that need logged user */}
-          <Route element={<LoggedRoutes/>}>
-            <Route path="/profile" element={<UserPage/>}/>
-          </Route>
-          {/* Routes that need Admin right */}
-          <Route element={<AdminRoutes/>}>
-            <Route path="/dashboard" element={<DashboardPage/>} />
-          </Route>
-        </Routes>
+              {/* Routes that need to have no users*/}
+              <Route element={<NotLoggedRoutes/>}>
+                <Route path="/" element={<LoginPage/>}/>
+              </Route>
+              {/* Routes that need logged user */}
+              <Route element={<LoggedRoutes/>}>
+                <Route path="/profile" element={<UserPage/>}/>
+              </Route>
+              {/* Routes that need Admin right */}
+              <Route element={<AdminRoutes/>}>
+                <Route path="/dashboard" element={<DashboardPage/>} />
+              </Route>
+          </Routes>
+        </div>
       </Router>
-    </div>
+    </>
   );
 };
 
