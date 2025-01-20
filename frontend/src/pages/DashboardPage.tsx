@@ -10,15 +10,18 @@ const DashboardPage = () => {
     const [user, setUser] = useState<User|null>(null);
     const [users, setUsers] = useState<User[]>([]);
 
+    const refreshUsers =  () => {
+      apiClient.get('/api/users')
+        .then((res) =>{
+          setUsers(res.data);
+        })
+        .catch((err) => console.log(err));
+    }
+
     useEffect(() => {
         const user = getLoggedUser();
         setUser(user);
-        apiClient.get('/api/users')
-            .then((res) =>{
-                console.log(res.data[0]);
-                setUsers(res.data);
-            })
-            .catch((err) => console.log(err));
+        refreshUsers();
     }, []);
 
     if (!user) {
@@ -31,9 +34,9 @@ const DashboardPage = () => {
       return (
           <div className="w-full">
               <h1>Welcome {user ? user.username : 'null'}</h1>
-              <NewUserDialog/>
+              <NewUserDialog refresh={refreshUsers}/>
               <ScrollArea>
-                <AccountTable users={users} connectedUser={user}/>
+                <AccountTable refresh={refreshUsers} users={users} connectedUser={user}/>
                 <ScrollBar orientation={'horizontal'}/>
               </ScrollArea>
           </div>

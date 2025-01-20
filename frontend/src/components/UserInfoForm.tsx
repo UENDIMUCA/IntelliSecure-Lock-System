@@ -15,11 +15,12 @@ import {CalendarIcon} from "lucide-react";
 import {Calendar} from "@/components/ui/calendar.tsx";
 
 interface FormProp {
+  refresh: () => void,
   setOpen: Dispatch<SetStateAction<boolean>>,
   user ?: User
 }
 
-export default function UserInfoForm({setOpen, user = undefined} : FormProp) {
+export default function UserInfoForm({refresh, setOpen, user = undefined} : FormProp) {
   const form = useForm<z.infer<typeof CreateUserSchema>>({
     resolver: zodResolver(CreateUserSchema),
     defaultValues: {
@@ -44,9 +45,9 @@ export default function UserInfoForm({setOpen, user = undefined} : FormProp) {
       endDate: values.endDate ? values.endDate.toISOString() : null,
     };
     apiClient.post(`/api/users`, formattedValues)
-      .then((res) => {
-        console.log(res);
+      .then(() => {
         toast({description: "User created"});
+        refresh();
       })
       .catch((err) => {
         console.log(err);

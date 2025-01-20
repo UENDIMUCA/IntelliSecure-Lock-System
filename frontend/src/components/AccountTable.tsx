@@ -3,15 +3,29 @@ import {Button} from "@/components/ui/button.tsx";
 import {ShieldBan, ShieldCheck, Trash, User as UserSVG} from "lucide-react";
 import {User} from "@/lib/types.ts";
 import {useToast} from "@/hooks/use-toast.ts";
+import apiClient from "@/lib/apiClient.ts";
 
 
 interface AccountProp {
+  refresh: () => void,
   users: User[],
   connectedUser: User
 }
 
-export default function AccountTable({users, connectedUser}: AccountProp ) {
+export default function AccountTable({refresh, users, connectedUser}: AccountProp ) {
   const { toast } = useToast();
+
+  function handleDelete(user: User)  {
+    apiClient.delete(`api/users/${user.id}`)
+      .then(() => {
+        toast({description: "User deleted"});
+        refresh();
+      })
+      .catch((err) => {
+        console.log(err);
+        toast({description: "Something went wrong", variant: "destructive"});
+      })
+  }
 
   return (
     <Table>
@@ -58,7 +72,7 @@ export default function AccountTable({users, connectedUser}: AccountProp ) {
                 <TableCell className={"flex flex-col gap-1 items-center md:flex-row"}>
                   {isNotMe
                     ? <Button variant={"destructive"} size={"icon"}
-                              onClick={() => toast({description: `${user.username} should be removed`})}><Trash/></Button>
+                              onClick={() => handleDelete(user)}><Trash/></Button>
                     : <UserSVG/>
                   }
                 </TableCell>

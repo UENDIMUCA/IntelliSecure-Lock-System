@@ -21,7 +21,12 @@ import {
   DrawerTitle,
   DrawerTrigger
 } from "@/components/ui/drawer";
-export default function NewUserDialog() {
+
+interface DialogProp {
+  refresh: () => void
+}
+
+export default function NewUserDialog({refresh}: DialogProp) {
   const [open, setOpen] = useState<boolean>(false);
   const isDesktop = useMediaQuery({query: "(min-width: 768px)"})
 
@@ -39,6 +44,7 @@ export default function NewUserDialog() {
             </DialogDescription>
           </DialogHeader>
           <UserInfoForm
+            refresh={refresh}
             setOpen={setOpen}/>
         </DialogContent>
       </Dialog>
@@ -53,7 +59,9 @@ export default function NewUserDialog() {
           <DrawerHeader className="text-left">
             <DrawerTitle>New user</DrawerTitle>
           </DrawerHeader>
-          <UserInfoForm setOpen={setOpen}/>
+          <UserInfoForm
+            refresh={refresh}
+            setOpen={setOpen}/>
           <DrawerFooter className="pt-2">
             <DrawerClose asChild>
               <Button variant="outline">Cancel</Button>
