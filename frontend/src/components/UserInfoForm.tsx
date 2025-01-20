@@ -102,7 +102,7 @@ export default function UserInfoForm({setOpen, user = undefined} : FormProp) {
           name="isTemporary"
           control={form.control}
           render={({field}) => (
-            <FormItem>
+            <FormItem className={"flex flex-row items-start space-x-3 space-y-0 my-2"}>
               <FormControl>
                 <Checkbox checked={field.value} onCheckedChange={field.onChange}/>
               </FormControl>
