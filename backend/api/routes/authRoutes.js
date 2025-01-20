@@ -87,4 +87,6 @@ router.post('/rfid_login', authController.rfid_login);
  */
 router.post('/pin_login', authController.pin_login);
 
+router.post('/logout', authController.logout);
+
 module.exports = router;

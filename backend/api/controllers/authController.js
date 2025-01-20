@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const config = require('../config/config');
 const User = require('../models/user');
+const BlacklistedToken = require('../models/blacklistedToken');
 const generateUniquePincode = require('../utils/pinCodeGenerator');
 
 module.exports = {
@@ -117,5 +118,23 @@ module.exports = {
       console.error(error);
       res.status(500).json({ error: 'Internal server error' });
     }
-  }
+  },
+  logout: async (req, res) => {
+    try {
+      const token = req.headers.authorization.split(' ')[1];
+      const decoded = jwt.verify(token, config.jwt.secret);
+
+      console.log(decoded);
+
+      await BlacklistedToken.create({
+        token,
+        expiresAt: new Date(decoded.exp * 1000),
+      });
+
+      res.status(200).json({ message: 'Logout successful' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
 };
