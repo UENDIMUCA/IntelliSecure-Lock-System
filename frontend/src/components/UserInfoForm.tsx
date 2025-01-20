@@ -140,7 +140,7 @@ export default function UserInfoForm({setOpen, user = undefined} : FormProp) {
           )}
         />
 
-        <Button type={"submit"} className={"mt-4"}>{isUpdate ? "Modifier" : "Créer"}</Button>
+        <Button type={"submit"} className={"mt-4 w-full md:w-auto"}>{isUpdate ? "Modifier" : "Créer"}</Button>
       </form>
     </Form>
   )
