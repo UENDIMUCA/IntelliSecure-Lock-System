@@ -37,7 +37,7 @@ module.exports = {
   getUserById: async (req, res) => {
     const user = await User.findByPk(req.params.id);
     if (!user) return res.status(404).json({ error: 'User not found' });
-    res.json(user.toJSON);
+    res.json(user.toJSON());
   },
 
   updateUser: async (req, res) => {
