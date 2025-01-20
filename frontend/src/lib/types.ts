@@ -20,6 +20,16 @@ export const  CreateUserSchema = z.object({
   password: z.string().min(6, {message: "Password should be at least 6 characters"}),
   uid: z.string().min(1, {message: "UID is required"}),
   isTemporary: z.boolean(),
-  beginDate: z.string().optional().or(z.literal('')),
-  endDate: z.string().optional().or(z.literal('')),
+  beginDate: z.date().optional(),
+  endDate: z.date().optional(),
 });
+
+export type  UpdateUserQuery = {
+  username: string;
+  email: string;
+  uid: string;
+  isTemporary: boolean;
+  password: string | undefined;
+  beginDate: string | undefined;
+  endDate: string | undefined;
+};
