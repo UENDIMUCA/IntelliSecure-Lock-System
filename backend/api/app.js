@@ -2,12 +2,13 @@ const express = require('express');
 const app = express();
 const { swaggerUi, specs } = require('./swagger');
 
-
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 
 
 const corsMiddleware = require('./middleware/corsMiddleware');
+
+require('./utils/tempUserCleanup');
 
 app.use(corsMiddleware);
 

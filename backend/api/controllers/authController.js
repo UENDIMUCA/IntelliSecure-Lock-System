@@ -14,6 +14,13 @@ module.exports = {
       const user = await User.findOne({ where: { username } });
       if (!user) return res.status(401).json({ error: 'User not found' });
 
+      const now = new Date();
+      if (user.beginDate && user.endDate) {
+        if (now < new Date(user.beginDate) || now > new Date(user.endDate)) {
+          return res.status(403).json({ error: 'User is not within the valid date range' });
+        }
+      }
+
       // Compare passwords
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) return res.status(401).json({ error: 'Invalid credentials' });
@@ -45,6 +52,13 @@ module.exports = {
       const user = await User.findOne({ where: { uid } });
       if (!user) return res.status(404).json({ error: 'User not found' });
 
+      const now = new Date();
+      if (user.beginDate && user.endDate) {
+        if (now < new Date(user.beginDate) || now > new Date(user.endDate)) {
+          return res.status(403).json({ error: 'User is not within the valid date range' });
+        }
+      }
+
       // Generate JWT
       const token = jwt.sign(
         { id: user.id, email: user.email, username:user.username, isAdmin: user.isAdmin },
@@ -71,6 +85,13 @@ module.exports = {
       // Search by 'pinCode'
       const user = await User.findOne({ where: { pincode } });
       if (!user) return res.status(404).json({ error: 'User not found' });
+
+      const now = new Date();
+      if (user.beginDate && user.endDate) {
+        if (now < new Date(user.beginDate) || now > new Date(user.endDate)) {
+          return res.status(403).json({ error: 'User is not within the valid date range' });
+        }
+      }
 
       // Generate JWT
       const token = jwt.sign(
