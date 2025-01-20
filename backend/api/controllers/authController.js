@@ -40,7 +40,7 @@ module.exports = {
 
       //publish a message to open the door
       if (openDoor) {
-        const message = JSON.stringify({ action: 'openDoor' });
+        const message = "openDoor";
         mqttClient.publish('doorTopic', message, (err) => {
           if (err) {
             console.error('Failed to publish message:', err);
