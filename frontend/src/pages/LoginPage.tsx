@@ -21,6 +21,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {useNavigate} from "react-router-dom";
 import apiClient from "@/lib/apiClient.ts";
+import {toast} from "@/hooks/use-toast.ts";
 const loginFormSchema = z.object({
   username: z.string().min(1, "Username is required"),
   password: z.string().min(1, "Password is required"),
@@ -44,9 +45,13 @@ const LoginPage = () => {
             localStorage.setItem("user", JSON.stringify(res.data.user));
             navigate('/dashboard');
         })
-        .catch(()=> {
+        .catch((err)=> {
+          if (err.status === 403) {
+            toast({title: "This user isn't active yet !", description: "Please refer to your administrator." , variant: "destructive"});
+          } else {
             form.setError('password', {type: 'error', message: 'Username or password is incorrect'});
             form.setError('username', {type: 'error', message: 'Username or password is incorrect'});
+          }
         });
   };
 
