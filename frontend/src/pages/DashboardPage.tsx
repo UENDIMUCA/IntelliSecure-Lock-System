@@ -4,6 +4,7 @@ import {User} from "@/lib/types.ts";
 import apiClient from "@/lib/apiClient.ts";
 import AccountTable from "@/components/AccountTable.tsx";
 import {ScrollArea, ScrollBar} from "@/components/ui/scroll-area.tsx";
+import NewUserDialog from "@/components/NewUserDialog.tsx";
 
 const DashboardPage = () => {
     const [user, setUser] = useState<User|null>(null);
@@ -30,6 +31,7 @@ const DashboardPage = () => {
       return (
           <div className="w-full">
               <h1>Welcome {user ? user.username : 'null'}</h1>
+              <NewUserDialog/>
               <ScrollArea>
                 <AccountTable users={users} connectedUser={user}/>
                 <ScrollBar orientation={'horizontal'}/>

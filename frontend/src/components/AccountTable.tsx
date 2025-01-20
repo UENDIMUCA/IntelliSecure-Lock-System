@@ -37,7 +37,7 @@ export default function AccountTable({users, connectedUser}: AccountProp ) {
                 <TableCell>{date.toLocaleString()}</TableCell>
                 <TableCell>{isAdmin}</TableCell>
                 <TableCell className={"flex flex-col gap-1 items-center md:flex-row"}>
-                  {!isNotMe
+                  {isNotMe
                     ? <Button variant={"destructive"} size={"icon"}
                               onClick={() => toast({description: `${user.username} should be removed`})}><Trash/></Button>
                     : <UserSVG/>
