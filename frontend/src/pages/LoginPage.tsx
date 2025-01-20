@@ -19,9 +19,10 @@ import {
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useSearchParams} from "react-router-dom";
 import apiClient from "@/lib/apiClient.ts";
 import {toast} from "@/hooks/use-toast.ts";
+import {useEffect} from "react";
 const loginFormSchema = z.object({
   username: z.string().min(1, "Username is required"),
   password: z.string().min(1, "Password is required"),
@@ -29,6 +30,26 @@ const loginFormSchema = z.object({
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    for (const entry of searchParams.entries()) {
+      if(entry[0] === "token") {
+        const body = {token: entry[1]};
+        apiClient.post('api/auth/check_qr_token', body)
+          .then((response) => {
+            console.log(response);
+            toast({description: "QR has been flashed, please login to continue"})
+          })
+          .catch((error) => {
+            console.log(error);
+            toast({description: "An error occurred. Please try again.", variant: "destructive"});
+          })
+        console.log("token detected");
+      }
+    }
+  }, [searchParams])
+
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
