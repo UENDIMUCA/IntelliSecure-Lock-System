@@ -97,7 +97,7 @@ export default function UserInfoForm({refresh, setOpen, user = undefined} : Form
           )}
         />
 
-        {!isUpdate ??
+        {!isUpdate ?
             <FormField
                 name="password"
                 control={form.control}
@@ -111,6 +111,7 @@ export default function UserInfoForm({refresh, setOpen, user = undefined} : Form
                   </FormItem>
                 )}
             />
+          : undefined
         }
 
 
