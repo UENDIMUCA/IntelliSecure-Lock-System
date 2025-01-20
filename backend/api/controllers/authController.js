@@ -67,7 +67,7 @@ module.exports = {
           }
         });
 
-        return res.status(200).json({ message: 'rfid publish' });
+        return res.status(201).json({ message: 'rfid publish' });
       }
 
       // Search by 'uid'
