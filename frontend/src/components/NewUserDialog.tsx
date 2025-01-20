@@ -49,7 +49,7 @@ export default function NewUserDialog() {
         <DrawerTrigger asChild>
           <Button><PlusCircle className="mr-1"/>Add a new user</Button>
         </DrawerTrigger>
-        <DrawerContent>
+        <DrawerContent className={"px-2"}>
           <DrawerHeader className="text-left">
             <DrawerTitle>New user</DrawerTitle>
           </DrawerHeader>
