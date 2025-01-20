@@ -89,4 +89,6 @@ router.post('/pin_login', authController.pin_login);
 
 router.post('/logout', authController.logout);
 
+router.get('/check_qr_token', authController.qr_check);
+
 module.exports = router;

@@ -4,6 +4,7 @@ const config = require('../config/config');
 const User = require('../models/user');
 const BlacklistedToken = require('../models/blacklistedToken');
 const generateUniquePincode = require('../utils/pinCodeGenerator');
+const { isTokenValid } = require('../utils/qrCodeToken');
 
 module.exports = {
   login: async (req, res) => {
@@ -137,4 +138,21 @@ module.exports = {
       res.status(500).json({ error: 'Internal server error' });
     }
   },
+  qr_check: async (req, res) => {
+    const { token } = req.body;
+
+    try {
+      const isValid = await isTokenValid(token);
+
+      if (!isValid) {
+        return res.status(400).json({ error: 'Invalid token' });
+      }
+
+      res.status(200).json({ message: 'Token is valid' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+
+  }
 };
