@@ -59,12 +59,12 @@ export default function AccountTable({refresh, users, connectedUser}: AccountPro
               }
               return (
                 <TableRow key={user.id}>
-                  <TableCell>{user.isAdmin ? <UserSVG className={"inline"}/> : undefined} {user.username}</TableCell>
+                  <TableCell className={"flex flex-col justify-center items-center md:justify-start md:flex-row md:gap-1"}>{user.isAdmin ? <UserSVG className={"inline"}/> : undefined} {user.username}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{date.toLocaleString()}</TableCell>
                   <TableCell>{isAdmin}</TableCell>
                   <TableCell>
-                    <div className='flex flex-row items-center gap-1'>
+                    <div className="flex flex-col justify-center items-center md:justify-start md:flex-row md:gap-1">
                       {
                         isActive
                           ? <ShieldCheck />
