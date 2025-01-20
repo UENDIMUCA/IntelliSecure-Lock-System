@@ -4,7 +4,11 @@ const config = require('../config/config');
 const User = require('../models/user');
 const BlacklistedToken = require('../models/blacklistedToken');
 const generateUniquePincode = require('../utils/pinCodeGenerator');
-const { isTokenValid } = require('../utils/qrCodeToken');
+const { isTokenValid} = require('../utils/qrCodeToken');
+const {mqttClient} = require('../config/mqtt');
+
+let rfidRegisterOn = false;
+let rfidRegisterTimeout;
 
 module.exports = {
   login: async (req, res) => {
@@ -50,6 +54,22 @@ module.exports = {
     const { uid } = req.body;
 
     try {
+
+      if (rfidRegisterOn) {
+        // Publish a message to register RFID
+        const message = JSON.stringify({ action: 'register', uid });
+        mqttClient.publish('rfidRegisterTopic', message, (err) => {
+          if (err) {
+            console.error('Failed to publish message:', err);
+            return res.status(500).json({ error: 'Failed to publish message' });
+          } else {
+            console.log('Message published:', message);
+          }
+        });
+
+        return res.status(200).json({ message: 'rfid publish' });
+      }
+
       // Search by 'uid'
       const user = await User.findOne({ where: { uid } });
       if (!user) return res.status(404).json({ error: 'User not found' });
@@ -153,6 +173,25 @@ module.exports = {
       console.error(error);
       res.status(500).json({ error: 'Internal server error' });
     }
+  },
+  rfid_register: async (req, res) => {
 
-  }
+    const { delay } = req.body;
+
+    rfidRegisterOn = true;
+    console.log('RFID register mode on');
+
+    // Clear any existing timeout to avoid multiple timeouts running simultaneously
+    if (rfidRegisterTimeout) {
+      clearTimeout(rfidRegisterTimeout);
+    }
+
+    // Set a timeout to turn off the register mode after 30 seconds
+    rfidRegisterTimeout = setTimeout(() => {
+      rfidRegisterOn = false;
+      console.log('RFID register mode off');
+    }, delay);
+
+    res.status(200).json({ message: 'RFID register process' });
+  },
 };

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page avec Numpad et QR Code</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.0.1/mqtt.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        .row {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .row:first-child {
+            height: 2vh;
+        }
+        .row:nth-child(2) {
+            height: 9vh;
+            display: flex;
+        }
+        .row:last-child {
+            height: 1vh;
+        }
+        .column {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+        #numpad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+        }
+        #numpad button {
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        #qrcode {
+            width: 150px;
+            height: 150px;
+        }
+        #message {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="row">
+        <h1>Bienvenue sur ma page</h1>
+    </div>
+
+    <div class="row">
+        <div class="column" id="numpad-container">
+            <div id="numpad">
+                <button>1</button>
+                <button>2</button>
+                <button>3</button>
+                <button>4</button>
+                <button>5</button>
+                <button>6</button>
+                <button>7</button>
+                <button>8</button>
+                <button>9</button>
+                <button>*</button>
+                <button>0</button>
+                <button>#</button>
+            </div>
+        </div>
+        <div class="column" id="qr-container">
+            <div id="qrcode"></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div id="message">Ceci est un message</div>
+    </div>
+
+    <script>
+
+        
+
+        // Connexion au serveur MQTT avec login et password
+        const options = {
+            host: 'mosquitto.intelli-secure.tom-fourcaudot.com',
+            port: 1883, // Remplacez par le port de votre broker MQTT si nécessaire
+            username: '', // Remplacez par votre nom d'utilisateur
+            password: 'your_password', // Remplacez par votre mot de passe
+        };
+
+        const client = mqtt.connect(options);
+        const topic = 'votre/topic/mosquitto';
+
+        // Initialiser le QR Code
+        const qrCode = new QRCode(document.getElementById('qrcode'), {
+            text: "Token non reçu",
+            width: 150,
+            height: 150
+        });
+
+        client.on('connect', () => {
+            console.log('Connecté au serveur MQTT');
+            client.subscribe(topic, (err) => {
+                if (!err) {
+                    console.log(`Abonné au topic : ${topic}`);
+                }
+            });
+        });
+
+        client.on('message', (topic, message) => {
+            const token = message.toString();
+            console.log(`Message reçu : ${token}`);
+            qrCode.makeCode(token);
+        });
+
+        // Changer la couleur du message
+        const messageElement = document.getElementById('message');
+        function changeMessageColor(color) {
+            messageElement.style.color = color;
+        }
+
+        // Exemple d’utilisation : changer la couleur toutes les 2 secondes
+        let colors = ['red', 'blue', 'green', 'orange'];
+        let currentIndex = 0;
+        setInterval(() => {
+            changeMessageColor(colors[currentIndex]);
+            currentIndex = (currentIndex + 1) % colors.length;
+        }, 2000);
+    </script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
+const authMiddleware = require('../middleware/authMiddleware');
 
 /**
  * @swagger
@@ -90,5 +91,7 @@ router.post('/pin_login', authController.pin_login);
 router.post('/logout', authController.logout);
 
 router.get('/check_qr_token', authController.qr_check);
+
+router.get('/rfid_register', authMiddleware, authController.rfid_register);
 
 module.exports = router;
