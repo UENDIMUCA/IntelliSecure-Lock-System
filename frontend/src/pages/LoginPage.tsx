@@ -22,7 +22,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import apiClient from "@/lib/apiClient.ts";
 import {toast} from "@/hooks/use-toast.ts";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 const loginFormSchema = z.object({
   username: z.string().min(1, "Username is required"),
   password: z.string().min(1, "Password is required"),
@@ -30,6 +30,7 @@ const loginFormSchema = z.object({
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const [isQrScanned, setIsQrScanned] = useState<boolean>(false)
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
@@ -40,6 +41,7 @@ const LoginPage = () => {
           .then((response) => {
             console.log(response);
             toast({description: "QR has been flashed, please login to continue"})
+            setIsQrScanned(true);
           })
           .catch((error) => {
             console.log(error);
@@ -60,7 +62,11 @@ const LoginPage = () => {
   });
 
   const onSubmit = (values: z.infer<typeof loginFormSchema>) => {
-    apiClient.post(`/api/auth/login/`, values)
+    const body = {
+      ...values,
+      openDoor: isQrScanned
+    }
+    apiClient.post(`/api/auth/login/`, body)
         .then((res) => {
             localStorage.setItem("token", res.data.token);
             localStorage.setItem("user", JSON.stringify(res.data.user));
