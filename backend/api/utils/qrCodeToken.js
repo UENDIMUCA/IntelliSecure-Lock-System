@@ -22,7 +22,7 @@ mqttClient.on('connect', () => {
     generateAndPublishToken();
 
     // Set interval to generate and publish a token every 20 seconds
-    setInterval(generateAndPublishToken, 20000); // 20000 milliseconds = 20 seconds
+    setInterval(generateAndPublishToken, 30000); // 30000 milliseconds = 30 seconds
 });
 
 mqttClient.on('error', (err) => {
