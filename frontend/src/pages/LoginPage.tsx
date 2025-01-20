@@ -40,17 +40,18 @@ const LoginPage = () => {
         apiClient.post('api/auth/check_qr_token', body)
           .then((response) => {
             console.log(response);
-            toast({description: "QR has been flashed, please login to continue"})
+            toast({description: "QR has been flashed, please login to continue"});
             setIsQrScanned(true);
           })
           .catch((error) => {
             console.log(error);
             toast({description: "An error occurred. Please try again.", variant: "destructive"});
+            navigate("/wrong-qr-code");
           })
         console.log("token detected");
       }
     }
-  }, [searchParams])
+  }, [searchParams, navigate])
 
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),

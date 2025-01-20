@@ -3,7 +3,6 @@ import { twMerge } from "tailwind-merge"
 import {User} from "@/lib/types.ts";
 import apiClient from "@/lib/apiClient.ts";
 
-
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -40,7 +39,16 @@ export function isAdmin(): boolean {
   return false;
 }
 
-export function logout(): void {
-  localStorage.removeItem("user");
-  localStorage.removeItem("token");
+export async function logout(): Promise<boolean> {
+  return apiClient.post(`/api/auth/logout`, {})
+    .then(() => {
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      return true;
+    })
+    .catch((err) => {
+      console.log(err);
+      return false;
+    });
 }
+

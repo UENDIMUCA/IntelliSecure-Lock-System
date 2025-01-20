@@ -1,10 +1,10 @@
 import { Button } from "./ui/button";
 import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import {Link, useLocation} from "react-router-dom";
+import {Link, useLocation, useNavigate, useSearchParams} from "react-router-dom";
 import {Toaster} from "@/components/ui/toaster.tsx";
 import LogoutButton from "@/components/LogoutButton.tsx";
-import {isAdmin, isLogged} from "@/lib/utils.ts";
+import {isAdmin, isLogged, logout} from "@/lib/utils.ts";
 import {useEffect, useState} from "react";
 
 const AllNavLinks = [
@@ -15,9 +15,24 @@ const AllNavLinks = [
 
 export default function NavBar() {
   const [NavLinks, setNavLinks] = useState(AllNavLinks);
-
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const pathname = useLocation();
   const isActive = (path: string) => path === pathname.pathname;
+
+  useEffect(() => {
+    for (const entry of searchParams.entries()) {
+      if (entry[0] === "token") {
+        logout()
+          .then(() => {
+            navigate(`/?token=${entry[1]}`);
+          })
+          .catch((err) => {
+            console.log(err)
+          });
+      }
+    }
+  }, [searchParams, navigate]);
 
   useEffect(() => {
     let tmpLinks = AllNavLinks;
