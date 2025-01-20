@@ -1,8 +1,10 @@
 import {useEffect, useState} from "react";
 import {getLoggedUser} from "@/lib/utils.ts";
 import {User} from "@/lib/types.ts";
-import LogoutButton from "@/components/LogoutButton.tsx";
 import apiClient from "@/lib/apiClient.ts";
+import AccountTable from "@/components/AccountTable.tsx";
+import {ScrollArea, ScrollBar} from "@/components/ui/scroll-area.tsx";
+import NewUserDialog from "@/components/NewUserDialog.tsx";
 
 const DashboardPage = () => {
     const [user, setUser] = useState<User|null>(null);
@@ -19,17 +21,25 @@ const DashboardPage = () => {
             .catch((err) => console.log(err));
     }, []);
 
-    return (
+    if (!user) {
+      return (
         <div>
-            <h1>Welcome {user ? user.username : 'null'}</h1>
-            <LogoutButton/>
-            <ul className="list-disc">
-                {users.map((user) =>
-                    <li key={user.id}>{user.username} {user.email} {user.isAdmin ? 'admin' : 'not admin'}</li>
-                )}
-            </ul>
+          <h1>Loading ...</h1>
         </div>
-    );
+      )
+    } else {
+      return (
+          <div className="w-full">
+              <h1>Welcome {user ? user.username : 'null'}</h1>
+              <NewUserDialog/>
+              <ScrollArea>
+                <AccountTable users={users} connectedUser={user}/>
+                <ScrollBar orientation={'horizontal'}/>
+              </ScrollArea>
+          </div>
+      );
+    }
+
 }
 
 export default DashboardPage;
