@@ -13,7 +13,7 @@ let rfidRegisterTimeout;
 module.exports = {
   login: async (req, res) => {
     // Destructure 'username' from req.body
-    const { username, password } = req.body;
+    const { username, password, openDoor } = req.body;
 
     try {
       // Search by 'username'
@@ -37,6 +37,19 @@ module.exports = {
         config.jwt.secret,
         { expiresIn: config.jwt.expiresIn }
       );
+
+      //publish a message to open the door
+      if (openDoor) {
+        const message = JSON.stringify({ action: 'openDoor' });
+        mqttClient.publish('doorTopic', message, (err) => {
+          if (err) {
+            console.error('Failed to publish message:', err);
+            return res.status(500).json({ error: 'Failed to publish message' });
+          } else {
+            console.log('Message published:', message);
+          }
+        });
+      }
 
       // Send success response with user info
       res.status(200).json({
