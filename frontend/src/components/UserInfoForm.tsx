@@ -10,7 +10,7 @@ import {CreateUserSchema, UpdateUserQuery, User} from "@/lib/types.ts";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import apiClient from "@/lib/apiClient.ts";
 import {PopoverDialog, PopoverContent, PopoverTrigger} from "@/components/ui/popoverDialog";
-import {cn} from "@/lib/utils.ts";
+import {cn, getLoggedUser} from "@/lib/utils.ts";
 import {CalendarIcon} from "lucide-react";
 import {Calendar} from "@/components/ui/calendar.tsx";
 
@@ -52,6 +52,9 @@ export default function UserInfoForm({refresh, setOpen, user = undefined} : Form
         .then((res) => {
           toast({description: `User ${res.data.username} updated`});
           refresh();
+          if (res.data.id == getLoggedUser()?.id) {
+            localStorage.setItem("user", JSON.stringify(res.data));
+          }
         })
         .catch((err) => {
           console.log(err);
