@@ -6,7 +6,7 @@ import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {toast} from "@/hooks/use-toast";
 import {Dispatch, SetStateAction} from "react";
-import {CreateUserSchema, User} from "@/lib/types.ts";
+import {CreateUserSchema, UpdateUserQuery, User} from "@/lib/types.ts";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import apiClient from "@/lib/apiClient.ts";
 import {PopoverDialog, PopoverContent, PopoverTrigger} from "@/components/ui/popoverDialog";
@@ -21,11 +21,12 @@ interface FormProp {
 }
 
 export default function UserInfoForm({refresh, setOpen, user = undefined} : FormProp) {
+  const isUpdate = user !== undefined
   const form = useForm<z.infer<typeof CreateUserSchema>>({
     resolver: zodResolver(CreateUserSchema),
     defaultValues: {
       username: user?.username ?? "",
-      password: "",
+      password: isUpdate ? "password_dumb" : "",
       email: user?.email ?? "",
       uid: user?.uid ?? "",
       isTemporary: !!user?.beginDate,
@@ -35,24 +36,43 @@ export default function UserInfoForm({refresh, setOpen, user = undefined} : Form
   });
 
   const { watch } = form;
-  const isUpdate = user !== undefined
   const isTemp = watch("isTemporary");
 
   async function onSubmit(values: z.infer<typeof CreateUserSchema>) {
-    const formattedValues = {
-      ...values,
-      beginDate: values.beginDate ? values.beginDate.toISOString() : null,
-      endDate: values.endDate ? values.endDate.toISOString() : null,
-    };
-    apiClient.post(`/api/users`, formattedValues)
-      .then(() => {
-        toast({description: "User created"});
-        refresh();
-      })
-      .catch((err) => {
-        console.log(err);
-        toast({description: "Something went wrong", variant: "destructive"});
-      });
+    console.log('qwekjrhgwqer');
+    if (isUpdate) {
+      const formattedValues = {
+        ...values,
+        beginDate: values.beginDate ? values.beginDate.toISOString() : null,
+        endDate: values.endDate ? values.endDate.toISOString() : null,
+      } as UpdateUserQuery;
+      delete formattedValues.password;
+      console.log(formattedValues);
+      apiClient.put(`/api/users/${user?.id}`, formattedValues)
+        .then((res) => {
+          toast({description: `User ${res.data.username} updated`});
+          refresh();
+        })
+        .catch((err) => {
+          console.log(err);
+          toast({description: "Something went wrong", variant: "destructive"});
+        });
+    } else {
+      const formattedValues = {
+        ...values,
+        beginDate: values.beginDate ? values.beginDate.toISOString() : null,
+        endDate: values.endDate ? values.endDate.toISOString() : null,
+      };
+      apiClient.post(`/api/users`, formattedValues)
+        .then(() => {
+          toast({description: "User created"});
+          refresh();
+        })
+        .catch((err) => {
+          console.log(err);
+          toast({description: "Something went wrong", variant: "destructive"});
+        });
+    }
     setOpen(false);
   }
 
@@ -74,19 +94,22 @@ export default function UserInfoForm({refresh, setOpen, user = undefined} : Form
           )}
         />
 
-        <FormField
-          name="password"
-          control={form.control}
-          render={({field}) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input {...field}/>
-              </FormControl>
-              <FormMessage/>
-            </FormItem>
-          )}
-        />
+        {!isUpdate ??
+            <FormField
+                name="password"
+                control={form.control}
+                render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input {...field}/>
+                    </FormControl>
+                    <FormMessage/>
+                  </FormItem>
+                )}
+            />
+        }
+
 
         <FormField
           name="email"
@@ -215,8 +238,7 @@ export default function UserInfoForm({refresh, setOpen, user = undefined} : Form
             </FormItem>
           )}
         />
-
-        <Button type={"submit"} className={"mt-4 w-full md:w-auto"}>{isUpdate ? "Modifier" : "Créer"}</Button>
+        <Button type={"submit"} className={"mt-4 w-full md:w-auto"}>{isUpdate ? "Update" : "Create"}</Button>
       </form>
     </Form>
   )

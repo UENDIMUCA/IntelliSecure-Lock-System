@@ -23,3 +23,13 @@ export const  CreateUserSchema = z.object({
   beginDate: z.date().optional(),
   endDate: z.date().optional(),
 });
+
+export type  UpdateUserQuery = {
+  username: string;
+  email: string;
+  uid: string;
+  isTemporary: boolean;
+  password: string | undefined;
+  beginDate: string | undefined;
+  endDate: string | undefined;
+};
