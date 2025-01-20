@@ -28,7 +28,9 @@ export default function UserInfoForm({setOpen, user = undefined} : FormProp) {
     }
   });
 
+  const { watch } = form;
   const isUpdate = user !== undefined
+  const isTemp = watch("isTemporary");
 
   async function onSubmit(values: z.infer<typeof CreateUserSchema>) {
     toast({description: "form submited"})
@@ -101,14 +103,43 @@ export default function UserInfoForm({setOpen, user = undefined} : FormProp) {
           control={form.control}
           render={({field}) => (
             <FormItem>
-              <FormLabel>Is the user temporary</FormLabel>
               <FormControl>
                 <Checkbox checked={field.value} onCheckedChange={field.onChange}/>
               </FormControl>
+              <FormLabel>Is the user temporary</FormLabel>
               <FormMessage/>
             </FormItem>
           )}
         />
+
+        <FormField
+          name="beginDate"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Begin Date</FormLabel>
+              <FormControl>
+                <Input {...field} disabled={!isTemp}/>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          name="endDate"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>End Date</FormLabel>
+              <FormControl>
+                <Input {...field} disabled={!isTemp}/>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <Button type={"submit"} className={"mt-4"}>{isUpdate ? "Modifier" : "Créer"}</Button>
       </form>
     </Form>
