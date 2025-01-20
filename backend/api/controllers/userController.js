@@ -5,6 +5,8 @@ module.exports = {
     try {
       const { isTemporary, beginDate, endDate } = req.body;
 
+      const _pincode = generateUniquePincode();
+
       // If this is a temporary user, validate the dates
       if (isTemporary) {
         if (!beginDate || !endDate) {
@@ -15,6 +17,7 @@ module.exports = {
       // Create the user, including temporary fields if provided
       const user = await User.create({
         ...req.body,
+        pincode: _pincode,
         beginDate: isTemporary ? beginDate : null,
         endDate: isTemporary ? endDate : null,
       });
