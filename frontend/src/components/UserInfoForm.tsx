@@ -8,6 +8,11 @@ import {toast} from "@/hooks/use-toast";
 import {Dispatch, SetStateAction} from "react";
 import {CreateUserSchema, User} from "@/lib/types.ts";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
+import apiClient from "@/lib/apiClient.ts";
+import {PopoverDialog, PopoverContent, PopoverTrigger} from "@/components/ui/popoverDialog";
+import {cn} from "@/lib/utils.ts";
+import {CalendarIcon} from "lucide-react";
+import {Calendar} from "@/components/ui/calendar.tsx";
 
 interface FormProp {
   setOpen: Dispatch<SetStateAction<boolean>>,
@@ -23,8 +28,8 @@ export default function UserInfoForm({setOpen, user = undefined} : FormProp) {
       email: user?.email ?? "",
       uid: user?.uid ?? "",
       isTemporary: !!user?.beginDate,
-      beginDate: user?.beginDate ?? undefined,
-      endDate: user?.beginDate ?? undefined,
+      beginDate: user?.beginDate ? new Date(user.beginDate) : undefined,
+      endDate: user?.beginDate ? new Date(user.endDate) : undefined,
     }
   });
 
@@ -33,8 +38,20 @@ export default function UserInfoForm({setOpen, user = undefined} : FormProp) {
   const isTemp = watch("isTemporary");
 
   async function onSubmit(values: z.infer<typeof CreateUserSchema>) {
-    toast({description: "form submited"})
-    console.log(values);
+    const formattedValues = {
+      ...values,
+      beginDate: values.beginDate ? values.beginDate.toISOString() : null,
+      endDate: values.endDate ? values.endDate.toISOString() : null,
+    };
+    apiClient.post(`/api/users`, formattedValues)
+      .then((res) => {
+        console.log(res);
+        toast({description: "User created"});
+      })
+      .catch((err) => {
+        console.log(err);
+        toast({description: "Something went wrong", variant: "destructive"});
+      });
     setOpen(false);
   }
 
@@ -113,28 +130,86 @@ export default function UserInfoForm({setOpen, user = undefined} : FormProp) {
         />
 
         <FormField
-          name="beginDate"
           control={form.control}
+          name="beginDate"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Begin Date</FormLabel>
-              <FormControl>
-                <Input {...field} disabled={!isTemp}/>
-              </FormControl>
+            <FormItem className="flex flex-col py-2">
+              <FormLabel>Begin date</FormLabel>
+              <PopoverDialog>
+                <PopoverTrigger asChild disabled={!isTemp}>
+                  <FormControl>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "pl-3 text-left font-normal",
+                        !field.value && "text-muted-foreground"
+                      )}
+                      disabled={!isTemp}
+                    >
+                      {field.value ? (
+                        field.value.toLocaleDateString()
+                      ) : (
+                        <span>Pick a date</span>
+                      )}
+                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={field.value}
+                    onSelect={field.onChange}
+                    disabled={(date) =>
+                      date < new Date(new Date().setHours(0,0,0,0))
+                    }
+                    initialFocus
+                  />
+                </PopoverContent>
+              </PopoverDialog>
               <FormMessage />
             </FormItem>
           )}
         />
 
         <FormField
-          name="endDate"
           control={form.control}
+          name="endDate"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>End Date</FormLabel>
-              <FormControl>
-                <Input {...field} disabled={!isTemp}/>
-              </FormControl>
+            <FormItem className="flex flex-col py-2">
+              <FormLabel>End date</FormLabel>
+              <PopoverDialog>
+                <PopoverTrigger asChild disabled={!isTemp}>
+                  <FormControl>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "pl-3 text-left font-normal",
+                        !field.value && "text-muted-foreground"
+                      )}
+                      disabled={!isTemp}
+                    >
+                      {field.value ? (
+                        field.value.toLocaleDateString()
+                      ) : (
+                        <span>Pick a date</span>
+                      )}
+                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={field.value}
+                    onSelect={field.onChange}
+                    disabled={(date) =>
+                      date < new Date(new Date().setHours(0,0,0,0))
+                    }
+                    initialFocus
+                  />
+                </PopoverContent>
+              </PopoverDialog>
               <FormMessage />
             </FormItem>
           )}
