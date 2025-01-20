@@ -279,7 +279,7 @@
         function sendPin() {
             const pinData = { pincode: currentPin };
             console.log('Envoi du PIN:', pinData);
-            fetch('http://localhost:3000/api/auth/pin_login/', {
+            fetch('https://api.intelli-secure.tom-fourcaudot.com/api/auth/pin_login/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
