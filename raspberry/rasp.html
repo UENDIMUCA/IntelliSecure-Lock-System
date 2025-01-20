@@ -1,146 +1,328 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Page avec Numpad et QR Code</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.0.1/mqtt.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        /* Réinitialisation de marges et paddings */
+        * {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            box-sizing: border-box;
         }
-        .row {
-            width: 100%;
+        
+        /* Corps de la page */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f8;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            margin: 10px 0;
+            height: 100vh;
         }
-        .row:first-child {
-            height: 2vh;
-        }
-        .row:nth-child(2) {
-            height: 9vh;
-            display: flex;
-        }
-        .row:last-child {
-            height: 1vh;
-        }
-        .column {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px;
-        }
-        #numpad {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
-        }
-        #numpad button {
-            width: 60px;
-            height: 60px;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-        #qrcode {
-            width: 150px;
-            height: 150px;
-        }
-        #message {
-            font-size: 1.2rem;
+
+        /* Titre principal */
+        h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 20px;
             font-weight: bold;
         }
+
+        /* Conteneur principal pour numpad et QR Code */
+        .main-container {
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            width: 80%;
+            max-width: 1200px;
+            margin: 20px;
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Numpad */
+        #numpad {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-gap: 15px;
+            justify-items: center;
+        }
+
+        #numpad button {
+            width: 90px;
+            height: 90px;
+            font-size: 1.5rem;
+            color: white;
+            background-color: #4CAF50; /* Couleur par défaut des boutons */
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #numpad button:hover {
+            background-color: #45a049;
+            transform: translateY(-5px);
+        }
+
+        /* Changer la couleur du bouton Reset (rouge) */
+        #reset {
+            background-color: #ff5722; /* Rouge */
+        }
+
+        #reset:hover {
+            background-color: #e64a19;
+        }
+
+        /* Bouton Send (bleu) */
+        #send {
+            background-color: #2196F3; /* Bleu */
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        #send:hover {
+            background-color: #1976D2;
+        }
+
+        #qrcode {
+            width: 100%;
+            height: 100%;
+            max-width: 450px;  /* Taille plus grande */
+            margin-bottom: 20px;
+        }
+
+        #token {
+            font-size: 1.1rem;
+            color: #333;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        /* Affichage du mot de passe */
+        #password-display {
+            margin-top: 15px;
+            font-size: 1.8rem;
+            font-family: monospace;
+            letter-spacing: 6px;
+            text-align: center;
+            color: #333;
+            min-width: 150px;  /* Taille fixe pour éviter le mouvement */
+            width: 150px;      /* Taille fixe pour garantir la stabilité */
+            height: 40px;      /* Hauteur fixe */
+            line-height: 40px; /* Aligner verticalement le texte */
+            background-color: #f9f9f9;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+        }
+
+        /* Message */
+        #message {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #333;
+            text-align: center;
+            padding: 15px;
+            width: 80%;
+            max-width: 600px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
     </style>
 </head>
 <body>
-    <div class="row">
-        <h1>Bienvenue sur ma page</h1>
-    </div>
 
-    <div class="row">
-        <div class="column" id="numpad-container">
-            <div id="numpad">
-                <button>1</button>
-                <button>2</button>
-                <button>3</button>
-                <button>4</button>
-                <button>5</button>
-                <button>6</button>
-                <button>7</button>
-                <button>8</button>
-                <button>9</button>
-                <button>*</button>
-                <button>0</button>
-                <button>#</button>
-            </div>
+    <h1>IntelliSecure</h1>
+
+    <div class="main-container">
+        <!-- Numpad -->
+        <div id="numpad">
+            <button onclick="addToPin('1')">1</button>
+            <button onclick="addToPin('2')">2</button>
+            <button onclick="addToPin('3')">3</button>
+            <button onclick="addToPin('4')">4</button>
+            <button onclick="addToPin('5')">5</button>
+            <button onclick="addToPin('6')">6</button>
+            <button onclick="addToPin('7')">7</button>
+            <button onclick="addToPin('8')">8</button>
+            <button onclick="addToPin('9')">9</button>
+            <button onclick="addToPin('0')">0</button>
+            <button id="reset" onclick="resetPin()">Reset</button>
+            <button id="send" onclick="sendPin()">Send</button>
         </div>
-        <div class="column" id="qr-container">
-            <div id="qrcode"></div>
-        </div>
+        <canvas id="qrcode"></canvas>
     </div>
 
-    <div class="row">
-        <div id="message">Ceci est un message</div>
-    </div>
+    <div id="password-display"></div> <!-- Affichage des '*' -->
 
+    <div id="message">Waiting ...</div>
+
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
     <script>
+        let currentPin = ''; // PIN actuellement saisi
+        let currentToken = ''; // Token MQTT actuel
 
-        
-
-        // Connexion au serveur MQTT avec login et password
-        const options = {
-            host: 'mosquitto.intelli-secure.tom-fourcaudot.com',
-            port: 1883, // Remplacez par le port de votre broker MQTT si nécessaire
-            username: '', // Remplacez par votre nom d'utilisateur
-            password: 'your_password', // Remplacez par votre mot de passe
+        const mqttConfig = {
+            host: '', // Remplir avec votre hôte MQTT
+            port: '', // Remplir avec votre port MQTT
+            username: '', // Remplir avec votre utilisateur MQTT
+            password: '', // Remplir avec votre mot de passe MQTT
+            qrCodeTopic: 'qrCodeTokenTopic', // Le topic MQTT pour recevoir le token
+            statusTopic: 'statusTopic' // Le topic MQTT pour recevoir le statut
         };
 
-        const client = mqtt.connect(options);
-        const topic = 'votre/topic/mosquitto';
+        // Chargement des credentials depuis un fichier de configuration
+        fetch('mqtt_config.json')
+            .then(response => response.json())
+            .then(config => {
+                Object.assign(mqttConfig, config);
+                setupMQTT();
+            })
+            .catch(error => console.error('Erreur lors du chargement des credentials MQTT:', error));
 
-        // Initialiser le QR Code
-        const qrCode = new QRCode(document.getElementById('qrcode'), {
-            text: "Token non reçu",
-            width: 150,
-            height: 150
-        });
+        function setupMQTT() {
+            const options = {
+                host: mqttConfig.host,
+                port: mqttConfig.port,
+                username: mqttConfig.username,
+                password: mqttConfig.password,
+            };
 
-        client.on('connect', () => {
-            console.log('Connecté au serveur MQTT');
-            client.subscribe(topic, (err) => {
-                if (!err) {
-                    console.log(`Abonné au topic : ${topic}`);
+            const client = mqtt.connect(options);
+
+            client.on('connect', () => {
+                console.log('Connecté à Mosquitto');
+                client.subscribe(mqttConfig.qrCodeTopic);
+                client.subscribe(mqttConfig.statusTopic);
+            });
+
+            client.on('message', (topic, message) => {
+                console.log('Message reçu:', message.toString());
+                if (topic === mqttConfig.qrCodeTopic) {
+                    // Le token reçu via MQTT
+                    currentToken = message.toString();
+                    generateQRCode(currentToken); // Générer le QR code avec le token
+                } else if (topic === mqttConfig.statusTopic) {
+                    try {
+                        const messageData = JSON.parse(message.toString()); // Assure-toi que le message est au format JSON
+                        
+                        const status = messageData.status;  // Par exemple 'success', 'error', etc.
+                        const content = messageData.content; // Le texte que tu veux afficher
+                        
+                        // Changer la couleur en fonction du status
+                        let color = '#333';  // Couleur par défaut
+                        if (status === 'success') {
+                            color = 'green';
+                        } else if (status === 'error') {
+                            color = 'red';
+                        } else if (status === 'warning') {
+                            color = 'orange';
+                        }
+            
+                        // Mettre à jour la couleur du message
+                        changeMessageColor(color);
+            
+                        // Réinitialiser le texte du message avec message.content
+                        document.getElementById('message').textContent = content;
+                    } catch (error) {
+                        console.error('Erreur lors du traitement du message MQTT (statusTopic):', error);
+                    }
                 }
             });
-        });
-
-        client.on('message', (topic, message) => {
-            const token = message.toString();
-            console.log(`Message reçu : ${token}`);
-            qrCode.makeCode(token);
-        });
-
-        // Changer la couleur du message
-        const messageElement = document.getElementById('message');
-        function changeMessageColor(color) {
-            messageElement.style.color = color;
         }
 
-        // Exemple d’utilisation : changer la couleur toutes les 2 secondes
-        let colors = ['red', 'blue', 'green', 'orange'];
-        let currentIndex = 0;
-        setInterval(() => {
-            changeMessageColor(colors[currentIndex]);
-            currentIndex = (currentIndex + 1) % colors.length;
-        }, 2000);
+        function addToPin(value) {
+            if (currentPin.length < 4) {
+                currentPin += value;
+                updatePasswordDisplay();
+            } else {
+                resetPin(); // Si le PIN dépasse 4 chiffres, on réinitialise
+            }
+        }
+
+        function resetPin() {
+            currentPin = '';
+            updatePasswordDisplay();
+        }
+
+        function updatePasswordDisplay() {
+            let display = '';
+            for (let i = 0; i < currentPin.length; i++) {
+                display += '*';
+            }
+            for (let i = currentPin.length; i < 4; i++) {
+                display += ' ';
+            }
+            document.getElementById('password-display').textContent = display;
+        }
+
+        function generateQRCode(token) {
+            const url = `https://intelli-secure.tom-fourcaudot.com/?token=${token}`;
+            console.log('Génération du QR Code avec l\'URL:', url);
+            QRCode.toCanvas(document.getElementById('qrcode'), url, {
+                width: 350,  // Augmenter la taille du QR Code
+                height: 350, // Hauteur augmentée du QR Code
+            }, error => {
+                if (error) console.error('Erreur de génération du QR Code:', error);
+            });
+        }
+
+        // Fonction pour envoyer la requête HTTP
+        function sendPin() {
+            const pinData = { pincode: currentPin };
+            console.log('Envoi du PIN:', pinData);
+            fetch('http://localhost:3000/api/auth/pin_login/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(pinData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Réponse de l\'API:', data);
+                // Afficher un message de confirmation
+                resetPin(); // Réinitialiser le PIN après chaque tentative
+                if (data.success) {
+                    changeMessageColor('green');
+                    document.getElementById('message').textContent = "Correct PIN!";
+                    setTimeout(() => {
+                        changeMessageColor('#333');
+                        document.getElementById('message').textContent = "Waiting...";
+                    }, 5000);
+                } else {
+                    changeMessageColor('red');
+                    document.getElementById('message').textContent = "Incorrect PIN!";
+                    setTimeout(() => {
+                        changeMessageColor('#333');
+                        document.getElementById('message').textContent = "Waiting...";
+                    }, 5000);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de l\'envoi du PIN:', error);
+                changeMessageColor('Orange');
+                document.getElementById('message').textContent = 'Warning: Server error!';
+                setTimeout(() => {
+                    changeMessageColor('#333');
+                    document.getElementById('message').textContent = "Waiting...";
+                }, 5000);
+            });
+        }
+
+        // Fonction pour changer la couleur du message
+        function changeMessageColor(color) {
+            document.getElementById('message').style.color = color;
+        }
     </script>
+
 </body>
 </html>

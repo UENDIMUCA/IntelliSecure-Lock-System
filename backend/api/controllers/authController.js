@@ -178,6 +178,16 @@ module.exports = {
 
     const { delay } = req.body;
 
+    const message = JSON.stringify({ status: "warning", content: "Please scan your RFID card" });
+    mqttClient.publish('statusTopic', message, (err) => {
+      if (err) {
+        console.error('Failed to publish message:', err);
+        return res.status(500).json({ error: 'Failed to publish message' });
+      } else {
+        console.log('Message published:', message);
+      }
+    });
+
     rfidRegisterOn = true;
     console.log('RFID register mode on');
 
@@ -190,6 +200,15 @@ module.exports = {
     rfidRegisterTimeout = setTimeout(() => {
       rfidRegisterOn = false;
       console.log('RFID register mode off');
+      const message = JSON.stringify({ status: "nothing", content: "Waiting..." });
+      mqttClient.publish('statusTopic', message, (err) => {
+        if (err) {
+          console.error('Failed to publish message:', err);
+          return res.status(500).json({ error: 'Failed to publish message' });
+        } else {
+          console.log('Message published:', message);
+        }
+      });
     }, delay);
 
     res.status(200).json({ message: 'RFID register process' });
