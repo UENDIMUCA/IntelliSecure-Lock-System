@@ -7,7 +7,7 @@ import {ScrollArea, ScrollBar} from "@/components/ui/scroll-area.tsx";
 import NewUserDialog from "@/components/NewUserDialog.tsx";
 
 const DashboardPage = () => {
-    const [user, setUser] = useState<User|null>(null);
+    const [user, setUser] = useState<User|undefined>(undefined);
     const [users, setUsers] = useState<User[]>([]);
 
     const refreshUsers =  () => {

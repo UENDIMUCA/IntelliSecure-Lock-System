@@ -34,9 +34,9 @@ export default function UpdateUserDialog({refresh, user, open, setOpen}: DialogP
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className={"lg:max-w-screen-lg overflow-y-scroll max-h-screen"}>
           <DialogHeader>
-            <DialogTitle>New user</DialogTitle>
+            <DialogTitle>Update user {user?.username}</DialogTitle>
             <DialogDescription>
-              Please fill the form to create a new user
+              Please update the form to edit this user
             </DialogDescription>
           </DialogHeader>
           <UserInfoForm

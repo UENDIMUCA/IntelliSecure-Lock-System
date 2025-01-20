@@ -6,6 +6,7 @@ import {useToast} from "@/hooks/use-toast.ts";
 import apiClient from "@/lib/apiClient.ts";
 import {useState} from "react";
 import UpdateUserDialog from "@/components/UpdateUserDialog.tsx";
+import {isAdmin} from "@/lib/utils.ts";
 
 
 interface AccountProp {
@@ -37,7 +38,7 @@ export default function AccountTable({refresh, users, connectedUser}: AccountPro
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Nom</TableHead>
+            <TableHead>{isAdmin()}Nom</TableHead>
             <TableHead>E-mail</TableHead>
             <TableHead>Date de création</TableHead>
             <TableHead>Role</TableHead>
@@ -58,7 +59,7 @@ export default function AccountTable({refresh, users, connectedUser}: AccountPro
               }
               return (
                 <TableRow key={user.id}>
-                  <TableCell>{user.username}</TableCell>
+                  <TableCell>{user.isAdmin ? <UserSVG className={"inline"}/> : undefined} {user.username}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{date.toLocaleString()}</TableCell>
                   <TableCell>{isAdmin}</TableCell>
@@ -79,7 +80,7 @@ export default function AccountTable({refresh, users, connectedUser}: AccountPro
                     {isNotMe
                       ? <Button variant={"destructive"} size={"icon"}
                                 onClick={() => handleDelete(user)}><Trash/></Button>
-                      : <UserSVG/>
+                      : undefined
                     }
                     <Button size={"icon"}
                             onClick={() => {
