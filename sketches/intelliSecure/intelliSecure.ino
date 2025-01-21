@@ -20,7 +20,8 @@
 
 #define BUZZER_PIN 26 // Pin pour buzzer
 
-#define BUTTON_PIN 35
+#define BUTTON_PIN 3
+bool buttonPressed = false; // Variable to track button state
 
 MFRC522 mfrc522(SDA_PIN, RST_PIN);  // Créer une instance de MFRC522
 
@@ -37,7 +38,7 @@ const char password[] = "draisine";
 const char* mqtt_server = "mosquitto.intelli-secure.tom-fourcaudot.com";  // Replace with your MQTT broker address
 const int mqtt_port = 1883; // Standard MQTT port
 const char* mqtt_user = "admin";  // Your MQTT username
-const char* mqtt_pass = "mot-de-passe-super-secret";  // Your MQTT password
+const char* mqtt_pass = "";  // Your MQTT password
 const char* mqtt_client_id = "esp32_client";   // Unique client ID for the MQTT connection
 const char* topic = "statusTopic";
 bool mqttConnected = false;
@@ -63,18 +64,6 @@ Keypad keypad = Keypad( makeKeymap(keys), pin_rows, pin_column, ROW_NUM, COLUMN_
 
 // Server configuration
 const String authApiUrl = "https://api.intelli-secure.tom-fourcaudot.com/api/auth/";
-
-volatile bool buttonInterruptTriggered = false;
-unsigned long lastDebounceTime = 0; // For debouncing
-const unsigned long debounceDelay = 50; // Debounce delay in milliseconds
-
-void IRAM_ATTR buttonISR() {
-  unsigned long currentTime = millis();
-  if ((currentTime - lastDebounceTime) > debounceDelay) { // Debouncing
-    buttonInterruptTriggered = true;
-    lastDebounceTime = currentTime;
-  }
-}
 
 void setup() {
   // set the speed at 15 rpm
@@ -102,23 +91,28 @@ void setup() {
 
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(BUTTON_PIN, INPUT_PULLUP);
-
-  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), buttonISR, FALLING);
-
 }
 
 void loop() {
   handlePin();
   handleRFID();
-  
-  // Handle button interrupt
-  if (buttonInterruptTriggered) {
-    buttonInterruptTriggered = false; // Reset the flag
+  handleButton();
+
+  if (!client.connected()) {
+    reconnectMQTT();
+  }
+  client.loop();  // Process incoming messages and handle connection
+}
+
+void handleButton(){
+  // --- Handle Button Press ---
+  if (digitalRead(BUTTON_PIN) == LOW && !buttonPressed) {
+    buttonPressed = true; // Mark button as pressed
     Serial.println("Button pressed: Opening the door");
     triggerAlert(100, 0, 1);
     if (doorOpen) {
       publishStatus("success", "Closing the door");
-    } else {
+    }else{
       publishStatus("success", "Opening the door");
     }
     triggerAlert(500, 0, 1);
@@ -127,10 +121,10 @@ void loop() {
     publishStatus("nothing", "Waiting...");
   }
 
-  if (!client.connected()) {
-    reconnectMQTT();
+  // Reset button state when released
+  if (digitalRead(BUTTON_PIN) == HIGH && buttonPressed) {
+    buttonPressed = false;
   }
-  client.loop();  // Process incoming messages and handle connection
 }
 
 // --- Handle Pin ---
