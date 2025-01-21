@@ -169,6 +169,7 @@
     <script>
         let currentPin = ''; // PIN actuellement saisi
         let currentToken = ''; // Token MQTT actuel
+        let client; // Déclaration globale pour le client MQTT
 
         const mqttConfig = {
             host: '', // Remplir avec votre hôte MQTT
@@ -196,7 +197,7 @@
                 password: mqttConfig.password,
             };
 
-            const client = mqtt.connect(options);
+            client = mqtt.connect(options);
 
             client.on('connect', () => {
                 console.log('Connecté à Mosquitto');
@@ -279,7 +280,7 @@
         function sendPin() {
             const pinData = { pincode: currentPin };
             console.log('Envoi du PIN:', pinData);
-            fetch('https://api.intelli-secure.tom-fourcaudot.com/api/auth/pin_login/', {
+            fetch('https://api.intelli-secure.tom-fourcaudot.com/api/auth/pin_login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -291,9 +292,10 @@
                 console.log('Réponse de l\'API:', data);
                 // Afficher un message de confirmation
                 resetPin(); // Réinitialiser le PIN après chaque tentative
-                if (data.success) {
+                if (data.message) {
                     changeMessageColor('green');
                     document.getElementById('message').textContent = "Correct PIN!";
+                    client.publish("doorTopic", "openDoor"); // Ouvrir la porte
                     setTimeout(() => {
                         changeMessageColor('#333');
                         document.getElementById('message').textContent = "Waiting...";
