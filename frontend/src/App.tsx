@@ -1,9 +1,11 @@
 import LoginPage from "./pages/LoginPage.tsx";
-import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from "react-router-dom";
+import {BrowserRouter as Router, Routes, Route, Navigate, Outlet, useSearchParams} from "react-router-dom";
 import DashboardPage from "@/pages/DashboardPage.tsx";
-import {isAdmin, isLogged} from "@/lib/utils.ts";
+import {isAdmin, isLogged, logout} from "@/lib/utils.ts";
 import UserPage from "@/pages/UserPage.tsx";
 import NavBar from "@/components/NavBar.tsx";
+import ErrorPage from "@/pages/ErrorPage.tsx";
+import {useEffect} from "react";
 
 const LoggedRoutes = () => {
   return (
@@ -18,6 +20,20 @@ const AdminRoutes = () => {
 }
 
 const NotLoggedRoutes = () => {
+  const [searchParams] = useSearchParams();
+  useEffect(() => {
+    for (const entry of searchParams.entries()) {
+      if (entry[0] === "token") {
+        logout()
+          .then(() => {
+            return <Outlet/>
+          })
+          .catch((err) => {
+            console.log(err)
+          });
+      }
+    }
+  }, [searchParams]);
   if (isAdmin()) return <Navigate to='/dashboard'/>
   if (isLogged()) return <Navigate to='/profile'/>
   return <Outlet />
@@ -44,6 +60,7 @@ const App = () => {
               <Route element={<AdminRoutes/>}>
                 <Route path="/dashboard" element={<DashboardPage/>} />
               </Route>
+            <Route path="*" element={<ErrorPage/>}/>
           </Routes>
         </div>
       </Router>

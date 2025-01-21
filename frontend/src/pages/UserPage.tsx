@@ -4,14 +4,22 @@ import {useState} from "react";
 import {User} from "@/lib/types.ts";
 import {Button} from "@/components/ui/button.tsx";
 import {RefreshCw} from "lucide-react";
+import {toast} from "@/hooks/use-toast.ts";
 
 const UserPage = () => {
   const [user, setUser] = useState<User|undefined>(getLoggedUser());
   const [open, setOpen] = useState<boolean>(false);
 
   const refresh = () => {
-    refreshLoggedUser();
-    setUser(getLoggedUser());
+    refreshLoggedUser()
+      .then(() => {
+        setUser(getLoggedUser());
+        toast({description: "User's up to date"});
+      })
+      .catch((err) => {
+        console.log(err);
+        toast({description: "An error occurred while refreshing user's data", variant: "destructive"});
+      });
   };
 
   open.valueOf();

@@ -39,7 +39,6 @@ export default function UserInfoForm({refresh, setOpen, user = undefined} : Form
   const isTemp = watch("isTemporary");
 
   async function onSubmit(values: z.infer<typeof CreateUserSchema>) {
-    console.log('qwekjrhgwqer');
     if (isUpdate) {
       const formattedValues = {
         ...values,
