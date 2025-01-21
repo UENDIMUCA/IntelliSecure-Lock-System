@@ -20,6 +20,8 @@
 
 #define BUZZER_PIN 26 // Pin pour buzzer
 
+#define BUTTON_PIN 35
+
 MFRC522 mfrc522(SDA_PIN, RST_PIN);  // Créer une instance de MFRC522
 
 bool doorOpen = true;
@@ -62,6 +64,18 @@ Keypad keypad = Keypad( makeKeymap(keys), pin_rows, pin_column, ROW_NUM, COLUMN_
 // Server configuration
 const String authApiUrl = "https://api.intelli-secure.tom-fourcaudot.com/api/auth/";
 
+volatile bool buttonInterruptTriggered = false;
+unsigned long lastDebounceTime = 0; // For debouncing
+const unsigned long debounceDelay = 50; // Debounce delay in milliseconds
+
+void IRAM_ATTR buttonISR() {
+  unsigned long currentTime = millis();
+  if ((currentTime - lastDebounceTime) > debounceDelay) { // Debouncing
+    buttonInterruptTriggered = true;
+    lastDebounceTime = currentTime;
+  }
+}
+
 void setup() {
   // set the speed at 15 rpm
   myStepper.setSpeed(15);
@@ -87,11 +101,31 @@ void setup() {
   Serial.println("Lecteur RFID prêt.");
 
   pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+
+  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), buttonISR, FALLING);
+
 }
 
 void loop() {
   handlePin();
   handleRFID();
+  
+  // Handle button interrupt
+  if (buttonInterruptTriggered) {
+    buttonInterruptTriggered = false; // Reset the flag
+    Serial.println("Button pressed: Opening the door");
+    triggerAlert(100, 0, 1);
+    if (doorOpen) {
+      publishStatus("success", "Closing the door");
+    } else {
+      publishStatus("success", "Opening the door");
+    }
+    triggerAlert(500, 0, 1);
+    door();
+    delay(5000); // Delay for the door to open
+    publishStatus("nothing", "Waiting...");
+  }
 
   if (!client.connected()) {
     reconnectMQTT();
