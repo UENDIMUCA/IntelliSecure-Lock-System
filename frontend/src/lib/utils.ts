@@ -18,7 +18,6 @@ export function getLoggedUser(): User | undefined {
 export async function refreshLoggedUser(): Promise<boolean> {
   return apiClient.get(`/api/users/${getLoggedUser()?.id}`)
     .then((res) => {
-      console.log(res.data);
       if (res.data) {
         localStorage.setItem("user", JSON.stringify(res.data));
         return true;

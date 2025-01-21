@@ -46,7 +46,6 @@ export default function UserInfoForm({refresh, setOpen, user = undefined} : Form
         endDate: values.endDate ? values.endDate.toISOString() : null,
       } as UpdateUserQuery;
       delete formattedValues.password;
-      console.log(formattedValues);
       apiClient.put(`/api/users/${user?.id}`, formattedValues)
         .then((res) => {
           toast({description: `User ${res.data.username} updated`});
