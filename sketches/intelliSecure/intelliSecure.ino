@@ -35,7 +35,7 @@ const char password[] = "draisine";
 const char* mqtt_server = "mosquitto.intelli-secure.tom-fourcaudot.com";  // Replace with your MQTT broker address
 const int mqtt_port = 1883; // Standard MQTT port
 const char* mqtt_user = "admin";  // Your MQTT username
-const char* mqtt_pass = "7ZdJ1bQ5DgXraxH71NDvFp&EDe";  // Your MQTT password
+const char* mqtt_pass = "mot-de-passe-super-secret";  // Your MQTT password
 const char* mqtt_client_id = "esp32_client";   // Unique client ID for the MQTT connection
 const char* topic = "statusTopic";
 bool mqttConnected = false;
@@ -242,6 +242,12 @@ void reconnectMQTT() {
     if (client.connect(mqtt_client_id, mqtt_user, mqtt_pass)) {
       Serial.println("connected");
       mqttConnected = true;
+       // Subscribe to a topic after successful connection
+      if (client.subscribe("doorTopic")) {  
+        Serial.println("Successfully subscribed to topic: doorTopic");
+      } else {
+        Serial.println("Failed to subscribe to topic.");
+      }
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -250,7 +256,6 @@ void reconnectMQTT() {
   }
 }
 
-// MQTT message callback function
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
   String message = "";
   for (int i = 0; i < length; i++) {
@@ -262,8 +267,12 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message: ");
   Serial.println(message);
 
-  // Add actions based on received message here
-  if (message == "open_door") {
-    door();  // Open the door if the command is received
+  // Vérifier si l'action est "openDoor"
+  if (message == "openDoor" && !doorOpen) {
+    publishStatus("success", "Opening the door");
+    triggerAlert(500, 0, 1);
+    door();
+    delay(5000);
+    publishStatus("nothing", "Waiting...");
   }
 }
